@@ -9,8 +9,9 @@
         <outputRelativeToContentRoot value="true" />
         <module name="registry-service" />
         <module name="gateway-service" />
+        <module name="like-service" />
       </profile>
-      <profile name="Annotation profile for post-service" enabled="true">
+      <profile name="Annotation profile for user-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -28,6 +29,7 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="gateway-service" options="-parameters" />
+      <module name="like-service" options="-parameters" />
       <module name="post-service" options="-parameters" />
       <module name="registry-service" options="-parameters" />
       <module name="user-service" options="-parameters" />
