@@ -3,6 +3,7 @@ package kz.adem.userservice.security;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,10 +13,10 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.function.Function;
 
 @Component
+
 public class JwtTokenProvider {
     @Value("${app.jwt-secret}")
     private String jwtSecret;
@@ -24,13 +25,14 @@ public class JwtTokenProvider {
     @Value("${app.refresh-token-expiration-milliseconds}")
     private Long refreshTokenExpirationDate;
 
-    public String generateToken(Authentication authentication){
+
+
+    public String generateToken(Authentication authentication,Long id){
         String username = authentication.getName();
-//        Date currentDate = new Date();
-//        Date expireDate = new Date(currentDate.getTime()+ accessTokenExpirationDate);
+//        Long id = userService.getUserIdByUsername(username);
         Map<String,Object> claims = new HashMap<>();
         claims.put("token_type","access_token");
-//        claims.put("jwt_id",UUID.randomUUID().toString());
+        claims.put("user_id",id);
         String token = Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
@@ -40,10 +42,11 @@ public class JwtTokenProvider {
         String tokenWithClaims = addClaimsToToken(token,claims);
         return tokenWithClaims;
     }
-    public String generateRefreshToken(Authentication authentication){
+    public String generateRefreshToken(Authentication authentication,Long id){
         String username = authentication.getName();
         Map<String,Object> claims = new HashMap<>();
         claims.put("token_type","refresh_token");
+        claims.put("user_id",id);
         String token = Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
@@ -115,4 +118,5 @@ public class JwtTokenProvider {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
+
 }
