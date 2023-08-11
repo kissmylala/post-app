@@ -115,9 +115,7 @@ import java.util.Set;
                 User user = userRepository.findByUsername(username)
                       .orElseThrow(()->new ResourceNotFoundException("User","username",username));
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-//                Authentication authentication = authenticationManager.authenticate(
-//                    new UsernamePasswordAuthenticationToken(username,null,userDetails.getAuthorities()));
-//                SecurityContextHolder.getContext().setAuthentication(authentication);
+
                 if (tokenProvider.isTokenValid(refreshToken,userDetails)){
                     revokeAllUsersToken(user);
                     String newAccessToken = tokenProvider.generateToken(SecurityContextHolder.getContext().getAuthentication());
