@@ -51,8 +51,8 @@ import java.util.Set;
                             new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
             revokeAllUsersToken(user);
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            String accessToken = tokenProvider.generateToken(authentication);
-            String refreshToken = tokenProvider.generateRefreshToken(authentication);
+            String accessToken = tokenProvider.generateToken(authentication, user.getId());
+            String refreshToken = tokenProvider.generateRefreshToken(authentication,user.getId());
 
             saveUserToken(user, accessToken);
             return JwtAuthResponse.builder()
@@ -118,8 +118,8 @@ import java.util.Set;
 
                 if (tokenProvider.isTokenValid(refreshToken,userDetails)){
                     revokeAllUsersToken(user);
-                    String newAccessToken = tokenProvider.generateToken(SecurityContextHolder.getContext().getAuthentication());
-                    String newRefreshToken = tokenProvider.generateRefreshToken(SecurityContextHolder.getContext().getAuthentication());
+                    String newAccessToken = tokenProvider.generateToken(SecurityContextHolder.getContext().getAuthentication(),user.getId());
+                    String newRefreshToken = tokenProvider.generateRefreshToken(SecurityContextHolder.getContext().getAuthentication(), user.getId());
                     saveUserToken(user,newAccessToken);
                     return JwtAuthResponse.builder()
                             .accessToken(newAccessToken)

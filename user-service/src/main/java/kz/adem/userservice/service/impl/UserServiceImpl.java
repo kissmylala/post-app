@@ -9,11 +9,8 @@ import kz.adem.userservice.mapper.UserMapper;
 import kz.adem.userservice.repository.RoleRepository;
 import kz.adem.userservice.repository.TokenRepository;
 import kz.adem.userservice.repository.UserRepository;
-import kz.adem.userservice.security.JwtTokenProvider;
-import kz.adem.userservice.service.AuthService;
 import kz.adem.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +27,8 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
     private final TokenRepository tokenRepository;
+    private static final String ROLE_USER = "ROLE_USER";
+    private static final String ROLE_ADMIN = "ROLE_ADMIN";
     @Override
     public List<UserDto> getAllUsers() {
         return userRepository.findAll()
@@ -77,34 +76,30 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto createUser(UserDto userDto){
         // TODO: 03.08.23 UserAlreadyExists exception
-        User newUser = UserMapper.MAPPER.mapToEntity(userDto);
-        newUser.setCreatedAt(new Date());
-        newUser.setEnabled(true);
-        Set<Role> roles = new HashSet<>();
-        Role user = roleRepository.findById(1L).get();
-        roles.add(user);
-        newUser.setRoles(roles);
-        return UserMapper.MAPPER.mapToDto(userRepository.save(newUser));
+
+        return createUserWithRole(userDto, ROLE_USER);
     }
     @Override
     public UserDto createAdmin(UserDto userDto){
         // TODO: 03.08.23 UserAlreadyExists exception
+        return createUserWithRole(userDto, ROLE_ADMIN);
+    }
+    private UserDto createUserWithRole(UserDto userDto, String roleName){
         User newUser = UserMapper.MAPPER.mapToEntity(userDto);
         newUser.setCreatedAt(new Date());
         newUser.setEnabled(true);
         Set<Role> roles = new HashSet<>();
-        Role admin = roleRepository.findByName("ROLE_ADMIN").get();
-        roles.add(admin);
+        Role role = roleRepository.findByName(roleName).orElseThrow(() -> new ResourceNotFoundException("Role", "name", roleName));
+        roles.add(role);
         newUser.setRoles(roles);
         return UserMapper.MAPPER.mapToDto(userRepository.save(newUser));
     }
 
     @Override
     public List<UserDto> getAllByEnabledIsFalse() {
-        List<UserDto> users = userRepository.findAllByEnabledIsFalse()
+        return userRepository.findAllByEnabledIsFalse()
                 .stream().map(UserMapper.MAPPER::mapToDto)
-                .collect(Collectors.toList());
-        return users;    }
+                .collect(Collectors.toList());    }
 
     @Override
     public UserDto getUserById(Long id) {
@@ -146,4 +141,5 @@ public class UserServiceImpl implements UserService {
         });
         tokenRepository.saveAll(validUserTokens);
     }
+
 }

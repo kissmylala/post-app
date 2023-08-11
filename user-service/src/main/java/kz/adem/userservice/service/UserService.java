@@ -17,7 +17,6 @@ public interface UserService {
     UserDto updateUser(Long userId,UserDto userDto);
     UserDto createUser(UserDto userDto);
     UserDto createAdmin(UserDto userDto);
-
     String banUser(String username);
 
 
