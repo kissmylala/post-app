@@ -36,7 +36,8 @@ public class Post {
     private Long userId;
     @Column(name = "username")
     private String username;
-
+    @Column(name = "likes")
+    private Long likes;
 
 
 }

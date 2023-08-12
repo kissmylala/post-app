@@ -35,7 +35,10 @@ public class JwtTokenFilter implements GatewayFilter {
                 }
                 if ("refresh_token".equals(tokenType) && request.getURI().getPath().equals("/api/auth/refresh-token")) {
                     String username = jwtTokenProvider.extractUsername(actualToken);
-                    exchange.getRequest().mutate().header("user", username);
+                    String userId = jwtTokenProvider.extractUserId(actualToken);
+                    exchange.getRequest().mutate().header("user", username)
+                            .header("user_id",userId)
+                            .build();
                     return chain.filter(exchange);
                 }
                 return webClient.get()
@@ -45,7 +48,10 @@ public class JwtTokenFilter implements GatewayFilter {
                         .flatMap(isTokenValid -> {
                             if (jwtTokenProvider.validateToken(actualToken) && !jwtTokenProvider.isTokenExpired(actualToken) && isTokenValid) {
                                 String username = jwtTokenProvider.extractUsername(actualToken);
-                                exchange.getRequest().mutate().header("user", username);
+                                String userId = jwtTokenProvider.extractUserId(actualToken);
+                                exchange.getRequest().mutate().header("user", username)
+                                        .header("user_id",userId)
+                                        .build();
                                 return chain.filter(exchange);
                             } else {
                                 return Mono.error(new RuntimeException("Token is not valid"));

@@ -61,6 +61,17 @@ public class PostController {
         String response = postService.deletePostById(postId,username);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
+    @PutMapping("/{postId}/like")
+    public ResponseEntity<PostDto> likePost(@PathVariable(value = "postId") Long postId,HttpServletRequest request){
+        String username = request.getHeader("user");
+        if (!StringUtils.hasText(username)){
+            throw new UnauthorizedAccessException("Unauthorized access");
+        }
+        Long userId = Long.parseLong(request.getHeader("user_id"));
+        postService.likePost(userId,postId);
+        PostDto likedPost = postService.getPostById(postId);
+        return new ResponseEntity<>(likedPost,HttpStatus.OK);
+    }
 
 
 }

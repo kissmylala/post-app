@@ -32,7 +32,7 @@ public class JwtTokenProvider {
 //        Long id = userService.getUserIdByUsername(username);
         Map<String,Object> claims = new HashMap<>();
         claims.put("token_type","access_token");
-        claims.put("user_id",id);
+        claims.put("user_id",String.valueOf(id));
         String token = Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
@@ -46,7 +46,7 @@ public class JwtTokenProvider {
         String username = authentication.getName();
         Map<String,Object> claims = new HashMap<>();
         claims.put("token_type","refresh_token");
-        claims.put("user_id",id);
+        claims.put("user_id",String.valueOf(id));
         String token = Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))

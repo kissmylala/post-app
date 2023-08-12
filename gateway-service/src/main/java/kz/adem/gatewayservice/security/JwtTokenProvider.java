@@ -39,6 +39,9 @@ public class JwtTokenProvider {
     public String extractTokenType(String token){
         return extractClaim(token,claims -> claims.get("token_type",String.class));
     }
+    public String extractUserId(String token){
+        return extractClaim(token,claims -> claims.get("user_id",String.class));
+    }
     private Date extractExpiration(String token){
         return extractClaim(token,Claims::getExpiration);
     }
