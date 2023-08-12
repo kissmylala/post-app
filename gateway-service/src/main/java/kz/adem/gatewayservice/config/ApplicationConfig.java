@@ -28,6 +28,9 @@ public class ApplicationConfig {
                 .route("user_service_admin",r -> r.path("/api/v1/admin/**")
                         .filters(f -> f.filter(jwtTokenFilter))
                         .uri("lb://USER-SERVICE"))
+                .route("post_like_service",r -> r.path("/api/v1/like/**")
+                        .filters(f -> f.filter(jwtTokenFilter))
+                        .uri("lb://LIKE-SERVICE"))
                 .build();
     }
 

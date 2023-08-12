@@ -7,6 +7,7 @@ import kz.adem.postservice.exception.ResourceNotFoundException;
 import kz.adem.postservice.exception.UnauthorizedAccessException;
 import kz.adem.postservice.mapper.PostMapper;
 import kz.adem.postservice.repository.PostRepository;
+import kz.adem.postservice.service.LikeClient;
 import kz.adem.postservice.service.PostService;
 import kz.adem.postservice.service.UserClient;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
     private final UserClient userClient;
+    private final LikeClient likeClient;
     @Override
     public List<PostDto> getAllPosts() {
         return postRepository.findAll()
@@ -48,6 +50,7 @@ public class PostServiceImpl implements PostService {
                 throw new ResourceNotFoundException("User","username",username);
             }
             postDto.setUserId(userDto.getId());
+            postDto.setLikes(0L);
         }
         return createPost(postDto);
     }
@@ -94,4 +97,25 @@ public class PostServiceImpl implements PostService {
         postRepository.deleteById(id);
         return "Post with id "+id+" successfully deleted!";
     }
+
+    @Override
+    public void incrementLikes(Long postId) {
+       Post post = postRepository.findById(postId)
+               .orElseThrow(()-> new ResourceNotFoundException("Post","id",String.valueOf(postId)));
+       post.setLikes(post.getLikes()+1);
+       postRepository.save(post);
+    }
+
+    @Override
+    public PostDto getPostById(Long postId) {
+        return postRepository.findById(postId)
+                .map(PostMapper.MAPPER::mapToDto)
+                .orElseThrow(()-> new ResourceNotFoundException("Post","id",String.valueOf(postId)));
+    }
+
+    @Override
+    public void likePost(Long userId, Long postId){
+        likeClient.likePost(userId,postId);
+    }
+
 }

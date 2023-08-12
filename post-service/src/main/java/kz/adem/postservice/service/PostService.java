@@ -12,5 +12,8 @@ public interface PostService {
   PostDto updatePost(Long id, PostDto postDto,String username);
   String deletePostById(Long id,String username);
   PostDto createPostWithUser(PostDto postDto, String username);
+  void incrementLikes(Long postId);
+  void likePost(Long userId, Long postId);
+  PostDto getPostById(Long postId);
 
 }

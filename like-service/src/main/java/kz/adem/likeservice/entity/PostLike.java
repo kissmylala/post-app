@@ -10,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "post_likes")
+@Table(name = "post_likes", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id","post_id"}))
 public class PostLike {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

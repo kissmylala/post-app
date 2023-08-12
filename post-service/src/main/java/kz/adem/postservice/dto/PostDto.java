@@ -23,6 +23,7 @@ public class PostDto {
     @JsonProperty(access = JsonProperty.Access.READ_WRITE)
     @NotEmpty
     private String username;
+    private Long likes;
 
 
 }
