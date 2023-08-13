@@ -26,6 +26,7 @@ public class CommentServiceImpl implements CommentService {
 
         Comment comment = CommentMapper.MAPPER.mapToEntity(commentDto);
         comment.setPostId(postId);
+        comment.setBody(commentDto.getBody());
         commentRepository.save(comment);
     }
 

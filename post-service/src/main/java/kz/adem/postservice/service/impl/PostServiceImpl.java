@@ -1,5 +1,6 @@
 package kz.adem.postservice.service.impl;
 
+import kz.adem.postservice.dto.CommentDto;
 import kz.adem.postservice.dto.PostDto;
 import kz.adem.postservice.dto.UserDto;
 import kz.adem.postservice.dto.UsernamesResponse;
@@ -8,6 +9,7 @@ import kz.adem.postservice.exception.ResourceNotFoundException;
 import kz.adem.postservice.exception.UnauthorizedAccessException;
 import kz.adem.postservice.mapper.PostMapper;
 import kz.adem.postservice.repository.PostRepository;
+import kz.adem.postservice.service.CommentClient;
 import kz.adem.postservice.service.LikeClient;
 import kz.adem.postservice.service.PostService;
 import kz.adem.postservice.service.UserClient;
@@ -25,6 +27,7 @@ public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final UserClient userClient;
     private final LikeClient likeClient;
+    private final CommentClient commentClient;
 
     @Override
     public List<PostDto> getAllPosts() {
@@ -140,5 +143,10 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<String> getPostLikers(Long postId) {
         return likeClient.getPostLikers(postId);
+    }
+
+    @Override
+    public String createCommentToPost(CommentDto commentDto, Long postId, String username, Long userId) {
+        return commentClient.createComment(commentDto, postId, username, userId);
     }
 }
