@@ -1,5 +1,6 @@
 package kz.adem.postservice.service;
 
+import kz.adem.postservice.dto.CommentDto;
 import kz.adem.postservice.dto.PostDto;
 import kz.adem.postservice.dto.UsernamesResponse;
 
@@ -19,6 +20,7 @@ public interface PostService {
   void unlikePost(Long userId, Long postId);
   List<String> getPostLikers(Long postId);
   Boolean existsBydId(Long postId);
+  String createCommentToPost(CommentDto commentDto, Long postId,String username, Long userId);
 
 
 }

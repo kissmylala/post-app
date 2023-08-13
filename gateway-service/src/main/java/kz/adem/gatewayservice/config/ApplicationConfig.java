@@ -31,6 +31,9 @@ public class ApplicationConfig {
                 .route("post_like_service",r -> r.path("/api/v1/like/**")
                         .filters(f -> f.filter(jwtTokenFilter))
                         .uri("lb://LIKE-SERVICE"))
+                .route("post_comment_service",r -> r.path("/api/v1/comments/**")
+                        .filters(f -> f.filter(jwtTokenFilter))
+                        .uri("lb://COMMENT-SERVICE"))
                 .build();
     }
 

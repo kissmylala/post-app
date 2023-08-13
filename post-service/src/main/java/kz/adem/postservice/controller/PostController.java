@@ -1,6 +1,7 @@
 package kz.adem.postservice.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import kz.adem.postservice.dto.CommentDto;
 import kz.adem.postservice.dto.PostDto;
 
 import kz.adem.postservice.exception.UnauthorizedAccessException;
@@ -92,6 +93,19 @@ public class PostController {
     public ResponseEntity<Boolean> existsBydId(@PathVariable(value = "postId") Long postId){
         Boolean exists = postService.existsBydId(postId);
         return new ResponseEntity<>(exists,HttpStatus.OK);
+    }
+    @PostMapping("/{postId}/comments")
+    public ResponseEntity<String> createCommentToPost(@RequestBody CommentDto commentDto,
+                                                      @PathVariable(value = "postId") Long postId,
+                                                      HttpServletRequest request){
+        String username = request.getHeader("user");
+        if (!StringUtils.hasText(username)){
+            throw new UnauthorizedAccessException("Unauthorized access");
+        }
+        Long userId = Long.parseLong(request.getHeader("user_id"));
+        String response = postService.createCommentToPost(commentDto,postId,username,userId);
+        return new ResponseEntity<>(response,HttpStatus.CREATED);
+
     }
 
 
