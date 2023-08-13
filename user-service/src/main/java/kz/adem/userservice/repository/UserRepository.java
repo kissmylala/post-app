@@ -15,4 +15,6 @@ public interface UserRepository extends JpaRepository<User,Long> {
     List<User> findAllByEnabledIsTrue();
     List<User> findAllByEnabledIsFalse();
     Optional<Long> findIdByUsername(String username);
+    List<User> findAllByIdIn(List<Long> ids);
+    //    //напиши мне метод который вернет список username на основе переданного списка id
 }

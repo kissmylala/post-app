@@ -18,6 +18,8 @@ public interface UserService {
     UserDto createUser(UserDto userDto);
     UserDto createAdmin(UserDto userDto);
     String banUser(String username);
+    List<String> getAllUsernamesByIdIn(List<Long> ids);
+    //напиши мне метод который вернет список username на основе переданного списка id
 
 
 

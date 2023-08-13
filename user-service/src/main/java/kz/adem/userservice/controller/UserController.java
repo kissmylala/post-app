@@ -50,6 +50,11 @@ public class UserController {
         }
         throw new AccessDeniedException("Access denied");
     }
+    @PostMapping("/liked/usernames")
+    public ResponseEntity<List<String>> getAllUsernamesByIdIn(@RequestBody List<Long> ids){
+        List<String> usernames = userService.getAllUsernamesByIdIn(ids);
+        return new ResponseEntity<>(usernames,HttpStatus.OK);
+    }
 
 
 

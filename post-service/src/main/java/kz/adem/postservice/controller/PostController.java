@@ -72,6 +72,22 @@ public class PostController {
         PostDto likedPost = postService.getPostById(postId);
         return new ResponseEntity<>(likedPost,HttpStatus.OK);
     }
+    @PutMapping("/{postId}/unlike")
+    public ResponseEntity<PostDto> unlikePost(@PathVariable(value = "postId") Long postId,HttpServletRequest request){
+        String username = request.getHeader("user");
+        if (!StringUtils.hasText(username)){
+            throw new UnauthorizedAccessException("Unauthorized access");
+        }
+        Long userId = Long.parseLong(request.getHeader("user_id"));
+        postService.unlikePost(userId,postId);
+        PostDto likedPost = postService.getPostById(postId);
+        return new ResponseEntity<>(likedPost,HttpStatus.OK);
+    }
+    @GetMapping("/{postId}/likers")
+    public ResponseEntity<List<String>> getPostLikers(@PathVariable(value = "postId") Long postId){
+        List<String> postLikers = postService.getPostLikers(postId);
+        return new ResponseEntity<>(postLikers,HttpStatus.OK);
+    }
 
 
 }

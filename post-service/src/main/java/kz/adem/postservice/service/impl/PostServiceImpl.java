@@ -2,6 +2,7 @@ package kz.adem.postservice.service.impl;
 
 import kz.adem.postservice.dto.PostDto;
 import kz.adem.postservice.dto.UserDto;
+import kz.adem.postservice.dto.UsernamesResponse;
 import kz.adem.postservice.entity.Post;
 import kz.adem.postservice.exception.ResourceNotFoundException;
 import kz.adem.postservice.exception.UnauthorizedAccessException;
@@ -115,7 +116,24 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public void likePost(Long userId, Long postId){
+        Post post = postRepository.findById(postId)
+                        .orElseThrow(()-> new ResourceNotFoundException("Post","id",String.valueOf(postId)));
         likeClient.likePost(userId,postId);
+        post.setLikes(post.getLikes()+1);
+        postRepository.save(post);
     }
 
+    @Override
+    public void unlikePost(Long userId, Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(()-> new ResourceNotFoundException("Post","id",String.valueOf(postId)));
+        likeClient.unlikePost(userId,postId);
+        post.setLikes(post.getLikes()-1);
+        postRepository.save(post);
+    }
+
+    @Override
+    public List<String> getPostLikers(Long postId) {
+        return likeClient.getPostLikers(postId);
+    }
 }
