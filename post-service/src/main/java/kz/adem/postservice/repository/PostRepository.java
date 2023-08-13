@@ -11,6 +11,4 @@ public interface PostRepository extends JpaRepository<Post,Long> {
     Optional<List<Post>> findAllByUsername(String username);
     Optional<Post> findByTitle(String title);
 
-
-
 }
