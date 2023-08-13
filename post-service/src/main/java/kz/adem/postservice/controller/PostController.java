@@ -88,6 +88,11 @@ public class PostController {
         List<String> postLikers = postService.getPostLikers(postId);
         return new ResponseEntity<>(postLikers,HttpStatus.OK);
     }
+    @GetMapping("/{postId}/exists")
+    public ResponseEntity<Boolean> existsBydId(@PathVariable(value = "postId") Long postId){
+        Boolean exists = postService.existsBydId(postId);
+        return new ResponseEntity<>(exists,HttpStatus.OK);
+    }
 
 
 }

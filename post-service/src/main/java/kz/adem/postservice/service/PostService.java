@@ -18,6 +18,7 @@ public interface PostService {
   PostDto getPostById(Long postId);
   void unlikePost(Long userId, Long postId);
   List<String> getPostLikers(Long postId);
+  Boolean existsBydId(Long postId);
 
 
 }
