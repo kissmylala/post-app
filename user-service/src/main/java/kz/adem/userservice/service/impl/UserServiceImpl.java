@@ -142,4 +142,12 @@ public class UserServiceImpl implements UserService {
         tokenRepository.saveAll(validUserTokens);
     }
 
+    @Override
+    public List<String> getAllUsernamesByIdIn(List<Long> ids) {
+        return userRepository.findAllByIdIn(ids)
+                .stream().map(User::getUsername)
+                .collect(Collectors.toList());
+    }
+
+
 }

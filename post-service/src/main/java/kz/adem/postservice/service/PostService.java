@@ -1,6 +1,7 @@
 package kz.adem.postservice.service;
 
 import kz.adem.postservice.dto.PostDto;
+import kz.adem.postservice.dto.UsernamesResponse;
 
 import java.util.List;
 
@@ -15,5 +16,8 @@ public interface PostService {
   void incrementLikes(Long postId);
   void likePost(Long userId, Long postId);
   PostDto getPostById(Long postId);
+  void unlikePost(Long userId, Long postId);
+  List<String> getPostLikers(Long postId);
+
 
 }
