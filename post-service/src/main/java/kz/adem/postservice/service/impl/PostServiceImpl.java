@@ -1,9 +1,6 @@
 package kz.adem.postservice.service.impl;
 
-import kz.adem.postservice.dto.CommentDto;
-import kz.adem.postservice.dto.PostDto;
-import kz.adem.postservice.dto.UserDto;
-import kz.adem.postservice.dto.UsernamesResponse;
+import kz.adem.postservice.dto.*;
 import kz.adem.postservice.entity.Post;
 import kz.adem.postservice.exception.ResourceNotFoundException;
 import kz.adem.postservice.exception.UnauthorizedAccessException;
@@ -118,6 +115,21 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    public PostCommentDto getPostByIdWithComments(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(()->new ResourceNotFoundException("Post", "id", String.valueOf(postId)));
+        PostDto postDto = PostMapper.MAPPER.mapToDto(post);
+        List<CommentDto> comments = commentClient.getCommentsByPostId(postId)
+                .stream().filter(commentDto->commentDto.getParentCommentId()==null)
+                .collect(Collectors.toList());
+        PostCommentDto postCommentDto = PostCommentDto.builder()
+                .postDto(postDto)
+                .commentDtoList(comments)
+                .build();
+        return postCommentDto;
+    }
+
+    @Override
     public void likePost(Long userId, Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Post", "id", String.valueOf(postId)));
@@ -148,5 +160,15 @@ public class PostServiceImpl implements PostService {
     @Override
     public String createCommentToPost(CommentDto commentDto, Long postId, String username, Long userId) {
         return commentClient.createComment(commentDto, postId, username, userId);
+    }
+
+    @Override
+    public String createReplyComment(CommentDto commentDto, Long postId, String username, Long userId, Long parentCommentId) {
+        return commentClient.createReplyComment(commentDto, postId, username, userId, parentCommentId);
+    }
+
+    @Override
+    public String deleteComment(Long postId, Long commentId, String username, Long userId) {
+        return commentClient.deleteComment(postId, commentId, username, userId);
     }
 }

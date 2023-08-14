@@ -21,6 +21,7 @@ public class Comment {
     private String username;
     private String userId;
     private String body;
+    private String repliedTo;
     private Long postId;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_comment_id")
