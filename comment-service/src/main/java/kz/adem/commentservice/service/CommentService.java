@@ -1,6 +1,5 @@
 package kz.adem.commentservice.service;
 
-import jakarta.servlet.http.HttpServletRequest;
 import kz.adem.commentservice.dto.CommentDto;
 
 import java.util.List;
@@ -10,5 +9,7 @@ public interface CommentService {
     void createComment(Long postId, CommentDto commentDto);
     CommentDto createCommentWithUser(String username, Long userId);
     List<CommentDto> getCommentsByPostId(Long postId);
+    void createReplyComment(Long postId, CommentDto commentDto, Long parentCommentId);
+    String deleteComment(Long postId, Long commentId, String username, Long userId);
 
 }

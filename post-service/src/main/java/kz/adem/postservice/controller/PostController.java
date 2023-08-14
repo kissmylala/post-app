@@ -2,6 +2,7 @@ package kz.adem.postservice.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import kz.adem.postservice.dto.CommentDto;
+import kz.adem.postservice.dto.PostCommentDto;
 import kz.adem.postservice.dto.PostDto;
 
 import kz.adem.postservice.exception.UnauthorizedAccessException;
@@ -41,6 +42,10 @@ public class PostController {
 
         PostDto createdPost = postService.createPostWithUser(postDto,username);
         return new ResponseEntity<>(createdPost,HttpStatus.CREATED);
+    }
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostCommentDto> getPostById(@PathVariable(value = "postId") Long postId){
+        return new ResponseEntity<>(postService.getPostByIdWithComments(postId),HttpStatus.OK);
     }
     @PutMapping("/{postId}")
     public ResponseEntity<PostDto> updatePost(@PathVariable(value = "postId") Long postId,
@@ -105,8 +110,35 @@ public class PostController {
         Long userId = Long.parseLong(request.getHeader("user_id"));
         String response = postService.createCommentToPost(commentDto,postId,username,userId);
         return new ResponseEntity<>(response,HttpStatus.CREATED);
-
     }
+    @PostMapping("/{postId}/comments/{parentCommentId}")
+    public ResponseEntity<String> createChildCommentToComment(@RequestBody CommentDto commentDto,
+                                                      @PathVariable(value = "postId") Long postId,
+                                                      HttpServletRequest request,
+                                                      @PathVariable(value = "parentCommentId") Long parentCommentId){
+        String username = request.getHeader("user");
+        if (!StringUtils.hasText(username)){
+            throw new UnauthorizedAccessException("Unauthorized access");
+        }
+        Long userId = Long.parseLong(request.getHeader("user_id"));
+        String response = postService.createReplyComment(commentDto,postId,username,userId,parentCommentId);
+        return new ResponseEntity<>(response,HttpStatus.CREATED);
+    }
+
+    // TODO: 15.08.23 refactor getting username and userid from request
+    @DeleteMapping("/{postId}/comments/{commentId}")
+    public ResponseEntity<String> deleteComment(@PathVariable(value = "postId") Long postId,
+                                                @PathVariable(value = "commentId") Long commentId,
+                                                HttpServletRequest request){
+        String username = request.getHeader("user");
+        if (!StringUtils.hasText(username)){
+            throw new UnauthorizedAccessException("Unauthorized access");
+        }
+        Long userId = Long.parseLong(request.getHeader("user_id"));
+        String response = postService.deleteComment(postId,commentId,username,userId);
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
 
 
 }

@@ -55,9 +55,4 @@ public class UserController {
         List<String> usernames = userService.getAllUsernamesByIdIn(ids);
         return new ResponseEntity<>(usernames,HttpStatus.OK);
     }
-
-
-
-
-
 }
