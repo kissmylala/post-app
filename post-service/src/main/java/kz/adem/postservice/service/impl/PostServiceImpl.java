@@ -171,4 +171,9 @@ public class PostServiceImpl implements PostService {
     public String deleteComment(Long postId, Long commentId, String username, Long userId) {
         return commentClient.deleteComment(postId, commentId, username, userId);
     }
+
+    @Override
+    public CommentDto updateComment(Long postId, Long commentId, CommentDto commentDto, String username, Long userId) {
+        return commentClient.updateComment(postId, commentId, commentDto, username, userId);
+    }
 }

@@ -24,6 +24,7 @@ public interface PostService {
   PostCommentDto getPostByIdWithComments(Long postId);
   String createReplyComment(CommentDto commentDto, Long postId, String username, Long userId, Long parentCommentId);
   String deleteComment(Long postId, Long commentId, String username, Long userId);
+  CommentDto updateComment(Long postId, Long commentId, CommentDto commentDto, String username, Long userId);
 
 
 }

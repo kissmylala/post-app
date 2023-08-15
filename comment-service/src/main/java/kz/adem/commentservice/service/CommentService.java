@@ -11,5 +11,6 @@ public interface CommentService {
     List<CommentDto> getCommentsByPostId(Long postId);
     void createReplyComment(Long postId, CommentDto commentDto, Long parentCommentId);
     String deleteComment(Long postId, Long commentId, String username, Long userId);
+    CommentDto updateComment(Long postId, Long commentId, CommentDto commentDto,String username, Long userId);
 
 }
