@@ -19,7 +19,7 @@ public class CommentDto {
     private Long userId;
     private String body;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String repliedTo;
+    private Long repliedTo;
     @JsonIgnore
     private Long postId;
     @JsonIgnore

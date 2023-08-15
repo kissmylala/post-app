@@ -38,7 +38,7 @@ public class PostController {
     }
     @PostMapping
     public ResponseEntity<PostDto> createPost(@RequestBody PostDto postDto, HttpServletRequest request){
-        String username = request.getHeader("user");
+        String username = getUsernameFromRequest(request);
 
         PostDto createdPost = postService.createPostWithUser(postDto,username);
         return new ResponseEntity<>(createdPost,HttpStatus.CREATED);
@@ -50,41 +50,29 @@ public class PostController {
     @PutMapping("/{postId}")
     public ResponseEntity<PostDto> updatePost(@PathVariable(value = "postId") Long postId,
                                               @RequestBody PostDto postDto,HttpServletRequest request){
-        String username = request.getHeader("user");
-        if (!StringUtils.hasText(username)){
-            throw new UnauthorizedAccessException("Unauthorized access");
-        }
+        String username = getUsernameFromRequest(request);
 
         PostDto updatedPost = postService.updatePost(postId,postDto,username);
         return new ResponseEntity<>(updatedPost,HttpStatus.OK);
     }
     @DeleteMapping("/{postId}")
     public ResponseEntity<String> deletePost(@PathVariable(value = "postId") Long postId,HttpServletRequest request){
-        String username = request.getHeader("user");
-        if (!StringUtils.hasText(username)){
-            throw new UnauthorizedAccessException("Unauthorized access");
-        }
+        String username = getUsernameFromRequest(request);
         String response = postService.deletePostById(postId,username);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
     @PutMapping("/{postId}/like")
     public ResponseEntity<PostDto> likePost(@PathVariable(value = "postId") Long postId,HttpServletRequest request){
-        String username = request.getHeader("user");
-        if (!StringUtils.hasText(username)){
-            throw new UnauthorizedAccessException("Unauthorized access");
-        }
-        Long userId = Long.parseLong(request.getHeader("user_id"));
+        String username = getUsernameFromRequest(request);
+        Long userId = getUserIdFromRequest(request);
         postService.likePost(userId,postId);
         PostDto likedPost = postService.getPostById(postId);
         return new ResponseEntity<>(likedPost,HttpStatus.OK);
     }
     @PutMapping("/{postId}/unlike")
     public ResponseEntity<PostDto> unlikePost(@PathVariable(value = "postId") Long postId,HttpServletRequest request){
-        String username = request.getHeader("user");
-        if (!StringUtils.hasText(username)){
-            throw new UnauthorizedAccessException("Unauthorized access");
-        }
-        Long userId = Long.parseLong(request.getHeader("user_id"));
+        String username = getUsernameFromRequest(request);
+        Long userId = getUserIdFromRequest(request);
         postService.unlikePost(userId,postId);
         PostDto likedPost = postService.getPostById(postId);
         return new ResponseEntity<>(likedPost,HttpStatus.OK);
@@ -103,11 +91,8 @@ public class PostController {
     public ResponseEntity<String> createCommentToPost(@RequestBody CommentDto commentDto,
                                                       @PathVariable(value = "postId") Long postId,
                                                       HttpServletRequest request){
-        String username = request.getHeader("user");
-        if (!StringUtils.hasText(username)){
-            throw new UnauthorizedAccessException("Unauthorized access");
-        }
-        Long userId = Long.parseLong(request.getHeader("user_id"));
+        String username = getUsernameFromRequest(request);
+        Long userId = getUserIdFromRequest(request);
         String response = postService.createCommentToPost(commentDto,postId,username,userId);
         return new ResponseEntity<>(response,HttpStatus.CREATED);
     }
@@ -116,11 +101,8 @@ public class PostController {
                                                       @PathVariable(value = "postId") Long postId,
                                                       HttpServletRequest request,
                                                       @PathVariable(value = "parentCommentId") Long parentCommentId){
-        String username = request.getHeader("user");
-        if (!StringUtils.hasText(username)){
-            throw new UnauthorizedAccessException("Unauthorized access");
-        }
-        Long userId = Long.parseLong(request.getHeader("user_id"));
+        String username = getUsernameFromRequest(request);
+        Long userId = getUserIdFromRequest(request);
         String response = postService.createReplyComment(commentDto,postId,username,userId,parentCommentId);
         return new ResponseEntity<>(response,HttpStatus.CREATED);
     }
@@ -130,13 +112,34 @@ public class PostController {
     public ResponseEntity<String> deleteComment(@PathVariable(value = "postId") Long postId,
                                                 @PathVariable(value = "commentId") Long commentId,
                                                 HttpServletRequest request){
-        String username = request.getHeader("user");
+        String username = getUsernameFromRequest(request);
+        Long userId = getUserIdFromRequest(request);
+        String response = postService.deleteComment(postId,commentId,username,userId);
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+    @PutMapping("/{postId}/comments/{commentId}")
+    public ResponseEntity<CommentDto> updateComment(@PathVariable("postId") Long postId,
+                                                    @PathVariable("commentId") Long commentId,
+                                                    @RequestBody CommentDto commentDto,
+                                                    HttpServletRequest request){
+        String username = getUsernameFromRequest(request);
+        Long userId = getUserIdFromRequest(request);
+        CommentDto updatedComment = postService.updateComment(postId,commentId,commentDto,username,userId);
+        return new ResponseEntity<>(updatedComment,HttpStatus.OK);
+    }
+    private String getUsernameFromRequest(HttpServletRequest request){
+        String username =  request.getHeader("user");
         if (!StringUtils.hasText(username)){
             throw new UnauthorizedAccessException("Unauthorized access");
         }
+        return username;
+    }
+    private Long getUserIdFromRequest(HttpServletRequest request){
         Long userId = Long.parseLong(request.getHeader("user_id"));
-        String response = postService.deleteComment(postId,commentId,username,userId);
-        return new ResponseEntity<>(response,HttpStatus.OK);
+        if (userId == null){
+            throw new UnauthorizedAccessException("Unauthorized access");
+        }
+        return userId;
     }
 
 

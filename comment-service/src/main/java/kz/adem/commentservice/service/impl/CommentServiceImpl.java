@@ -52,9 +52,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public void createReplyComment(Long postId, CommentDto commentDto, Long parentCommentId) {
-        if (!postClient.existsById(postId)) {
-            throw new ResourceNotFoundException("Post", "id", String.valueOf(postId));
-        }
+        validatePostExists(postId);
         Comment parentComment = commentRepository.findById(parentCommentId)
                 .orElseThrow(()->new ResourceNotFoundException("Comment","id",String.valueOf(parentCommentId)));
         if (parentComment.getParentComment()!=null){
@@ -63,23 +61,37 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = CommentMapper.MAPPER.mapToEntity(commentDto);
         comment.setPostId(postId);
         comment.setBody(commentDto.getBody());
-        comment.setParentComment(commentRepository.findById(parentCommentId)
-                .orElseThrow(()->new ResourceNotFoundException("Comment","id",String.valueOf(parentCommentId))));
+        comment.setParentComment(parentComment);
         comment.setRepliedTo(commentDto.getRepliedTo());
         commentRepository.save(comment);
     }
 
     @Override
     public String deleteComment(Long postId, Long commentId, String username, Long userId) {
+        validatePostExists(postId);
+        Comment comment = getCommentAndValidateUser(commentId, username, userId);
+        commentRepository.deleteById(commentId);
+        return "Comment successfully deleted";
+    }
+
+    @Override
+    public CommentDto updateComment(Long postId, Long commentId,CommentDto commentDto, String username, Long userId) {
+        validatePostExists(postId);
+        Comment comment = getCommentAndValidateUser(commentId, username, userId);
+        comment.setBody(commentDto.getBody());
+        return CommentMapper.MAPPER.mapToDto(commentRepository.save(comment));
+    }
+    private void validatePostExists(Long postId){
         if (!postClient.existsById(postId)) {
             throw new ResourceNotFoundException("Post", "id", String.valueOf(postId));
         }
+    }
+    private Comment getCommentAndValidateUser(Long commentId, String username, Long userId){
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(()->new ResourceNotFoundException("Comment","id",String.valueOf(commentId)));
         if (!comment.getUsername().equals(username) || !comment.getUserId().equals(String.valueOf(userId))){
-            throw new UnauthorizedAccessException("You are not allowed to delete this comment");
+            throw new UnauthorizedAccessException("You are not allowed to perform this action on this comment");
         }
-        commentRepository.deleteById(commentId);
-        return "Comment successfully deleted";
+        return comment;
     }
 }

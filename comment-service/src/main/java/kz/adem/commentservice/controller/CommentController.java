@@ -43,5 +43,13 @@ public class CommentController {
                                                 @RequestParam("username") String username, @RequestParam("userId") Long userId) {
         return ResponseEntity.ok(commentService.deleteComment(postId, commentId, username, userId));
     }
-}
+    @PutMapping("/{postId}/{commentId}")
+    public ResponseEntity<CommentDto> updateComment(@PathVariable("postId") Long postId, @PathVariable("commentId") Long commentId,
+                                                    @RequestBody CommentDto commentDto, @RequestParam("username") String username,
+                                                    @RequestParam("userId") Long userId) {
+        return ResponseEntity.ok(commentService.updateComment(postId, commentId, commentDto, username, userId));
+    }
+
+    }
+
 

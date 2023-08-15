@@ -20,6 +20,11 @@ public interface CommentClient {
                             @RequestParam("username") String username,@RequestParam("userId") Long userId,
                               @PathVariable Long parentCommentId);
     @DeleteMapping("/api/v1/comments/{postId}/{commentId}")
-    String deleteComment(@PathVariable Long postId, @PathVariable Long commentId,
+    String deleteComment(@PathVariable("postId") Long postId, @PathVariable("commentId") Long commentId,
                          @RequestParam("username") String username, @RequestParam("userId") Long userId);
+
+    @PutMapping("/api/v1/comments/{postId}/{commentId}")
+    CommentDto updateComment(@PathVariable("postId") Long postId, @PathVariable("commentId") Long commentId,
+                             @RequestBody CommentDto commentDto, @RequestParam("username") String username,
+                             @RequestParam("userId") Long userId);
 }
