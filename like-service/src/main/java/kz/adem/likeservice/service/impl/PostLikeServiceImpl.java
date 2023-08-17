@@ -50,13 +50,5 @@ public class PostLikeServiceImpl implements PostLikeService {
         return usernames;
     }
 
-    @Override
-    public boolean isLiked(Long userId, Long postId) {
-        return false;
-    }
 
-    @Override
-    public Long countByPostId(Long postId) {
-        return null;
-    }
 }

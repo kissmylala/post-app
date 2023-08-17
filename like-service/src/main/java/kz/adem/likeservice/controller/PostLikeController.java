@@ -14,17 +14,17 @@ import java.util.List;
 public class PostLikeController {
     private final PostLikeService postLikeService;
     @PostMapping
-    ResponseEntity<Void> likePost(@RequestParam Long userId,@RequestParam Long postId){
+    public ResponseEntity<Void> likePost(@RequestParam Long userId,@RequestParam Long postId){
         postLikeService.likePost(userId,postId);
         return ResponseEntity.ok().build();
     }
     @PostMapping("/unlike")
-    ResponseEntity<Void> unlikePost(@RequestParam Long userId,@RequestParam Long postId){
+    public ResponseEntity<Void> unlikePost(@RequestParam Long userId,@RequestParam Long postId){
         postLikeService.unlikePost(userId,postId);
         return ResponseEntity.ok().build();
     }
     @GetMapping("/likers")
-    ResponseEntity<List<String>> getPostLikers(@RequestParam Long postId){
+    public ResponseEntity<List<String>> getPostLikers(@RequestParam Long postId){
         List<String> postLikers = postLikeService.getLikedUsernames(postId);
         return ResponseEntity.ok(postLikers);
     }

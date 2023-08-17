@@ -27,4 +27,15 @@ public interface CommentClient {
     CommentDto updateComment(@PathVariable("postId") Long postId, @PathVariable("commentId") Long commentId,
                              @RequestBody CommentDto commentDto, @RequestParam("username") String username,
                              @RequestParam("userId") Long userId);
+    @GetMapping("/api/v1/comments/commentId/{commentId}")
+    CommentDto getCommentById(@PathVariable("commentId") Long commentId);
+
+    @PutMapping("/api/v1/comments/{commentId}/like")
+    CommentDto likeComment(@PathVariable("commentId") Long commentId, @RequestParam("userId") Long userId);
+
+    @PutMapping("/api/v1/comments/{commentId}/unlike")
+    CommentDto unlikeComment(@PathVariable("commentId") Long commentId, @RequestParam("userId") Long userId);
+
+    @GetMapping("/api/v1/comments/{commentId}/likers")
+    List<String> getCommentLikers(@PathVariable("commentId") Long commentId);
 }

@@ -20,6 +20,7 @@ public class CommentDto {
     private String body;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long repliedTo;
+    private Long likes;
     @JsonIgnore
     private Long postId;
     @JsonIgnore

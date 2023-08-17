@@ -141,6 +141,28 @@ public class PostController {
         }
         return userId;
     }
+    @PutMapping("/{postId}/comments/{commentId}/like")
+    public ResponseEntity<CommentDto> likeComment(@PathVariable(value = "postId") Long postId,
+                                                   @PathVariable(value = "commentId") Long commentId,
+                                                   HttpServletRequest request){
+        Long userId = getUserIdFromRequest(request);
+        CommentDto likedComment = postService.likeComment(userId,commentId);
+        return new ResponseEntity<>(likedComment,HttpStatus.OK);
+    }
+    @PutMapping("/{postId}/comments/{commentId}/unlike")
+    public ResponseEntity<CommentDto> unlikeComment(@PathVariable(value = "postId") Long postId,
+                                                  @PathVariable(value = "commentId") Long commentId,
+                                                  HttpServletRequest request){
+        Long userId = getUserIdFromRequest(request);
+        CommentDto likedComment = postService.unlikeComment(userId,commentId);
+        return new ResponseEntity<>(likedComment,HttpStatus.OK);
+    }
+    @GetMapping("/{postId}/comments/{commentId}/likers")
+    public ResponseEntity<List<String>> getCommentLikers(@PathVariable("commentId") Long commentId){
+        List<String> commentLikers = postService.getCommentLikers(commentId);
+        return new ResponseEntity<>(commentLikers,HttpStatus.OK);
+    }
+
 
 
 

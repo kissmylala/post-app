@@ -17,6 +17,7 @@ public class CommentDto {
     private Long userId;
     private String body;
     private Long repliedTo;
+    private Long likes;
     private Long postId;
     private Long parentCommentId;
     private List<CommentDto> replies;
