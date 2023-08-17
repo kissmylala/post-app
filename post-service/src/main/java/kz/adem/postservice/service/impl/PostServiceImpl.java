@@ -176,4 +176,19 @@ public class PostServiceImpl implements PostService {
     public CommentDto updateComment(Long postId, Long commentId, CommentDto commentDto, String username, Long userId) {
         return commentClient.updateComment(postId, commentId, commentDto, username, userId);
     }
+
+    @Override
+    public CommentDto likeComment(Long userId, Long commentId) {
+     return   commentClient.likeComment(userId, commentId);
+    }
+
+    @Override
+    public CommentDto unlikeComment(Long userId, Long commentId) {
+       return  commentClient.unlikeComment(userId, commentId);
+    }
+
+    @Override
+    public List<String> getCommentLikers(Long commentId) {
+        return commentClient.getCommentLikers(commentId);
+    }
 }
