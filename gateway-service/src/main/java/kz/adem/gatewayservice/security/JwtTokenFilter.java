@@ -1,5 +1,6 @@
 package kz.adem.gatewayservice.security;
 
+import kz.adem.gatewayservice.service.TokenValidationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -17,8 +18,9 @@ public class JwtTokenFilter implements GatewayFilter {
     private final RouterValidator routerValidator;
     private final JwtTokenProvider jwtTokenProvider;
 //    private final TokenServiceClient tokenServiceClient;
+    private final TokenValidationService tokenValidationService;
 
-    private WebClient webClient = WebClient.builder().build();
+//    private WebClient webClient = WebClient.builder().build();
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -41,10 +43,7 @@ public class JwtTokenFilter implements GatewayFilter {
                             .build();
                     return chain.filter(exchange);
                 }
-                return webClient.get()
-                        .uri("http://localhost:8082/api/token/validate?token=" + actualToken)
-                        .retrieve()
-                        .bodyToMono(Boolean.class)
+                return tokenValidationService.isTokenValid(actualToken)
                         .flatMap(isTokenValid -> {
                             if (jwtTokenProvider.validateToken(actualToken) && !jwtTokenProvider.isTokenExpired(actualToken) && isTokenValid) {
                                 String username = jwtTokenProvider.extractUsername(actualToken);
