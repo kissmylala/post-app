@@ -15,9 +15,6 @@ import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler{
-
-
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public Mono<ResponseEntity<Map<String, String>>> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
