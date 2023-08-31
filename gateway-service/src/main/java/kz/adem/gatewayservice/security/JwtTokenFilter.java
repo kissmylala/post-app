@@ -8,7 +8,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
@@ -17,10 +16,8 @@ import reactor.core.publisher.Mono;
 public class JwtTokenFilter implements GatewayFilter {
     private final RouterValidator routerValidator;
     private final JwtTokenProvider jwtTokenProvider;
-//    private final TokenServiceClient tokenServiceClient;
     private final TokenValidationService tokenValidationService;
 
-//    private WebClient webClient = WebClient.builder().build();
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -38,20 +35,20 @@ public class JwtTokenFilter implements GatewayFilter {
                 if ("refresh_token".equals(tokenType) && request.getURI().getPath().equals("/api/auth/refresh-token")) {
                     String username = jwtTokenProvider.extractUsername(actualToken);
                     String userId = jwtTokenProvider.extractUserId(actualToken);
-                    exchange.getRequest().mutate().header("user", username)
+                    ServerHttpRequest mutatedRequest = exchange.getRequest().mutate().header("user", username)
                             .header("user_id",userId)
                             .build();
-                    return chain.filter(exchange);
+                    return chain.filter(exchange.mutate().request(mutatedRequest).build());
                 }
                 return tokenValidationService.isTokenValid(actualToken)
                         .flatMap(isTokenValid -> {
                             if (jwtTokenProvider.validateToken(actualToken) && !jwtTokenProvider.isTokenExpired(actualToken) && isTokenValid) {
                                 String username = jwtTokenProvider.extractUsername(actualToken);
                                 String userId = jwtTokenProvider.extractUserId(actualToken);
-                                exchange.getRequest().mutate().header("user", username)
+                                ServerHttpRequest mutatedRequest = exchange.getRequest().mutate().header("user", username)
                                         .header("user_id",userId)
                                         .build();
-                                return chain.filter(exchange);
+                                return chain.filter(exchange.mutate().request(mutatedRequest).build());
                             } else {
                                 return Mono.error(new RuntimeException("Token is not valid"));
                             }

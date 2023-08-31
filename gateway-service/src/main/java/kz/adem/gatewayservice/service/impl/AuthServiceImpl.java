@@ -122,13 +122,19 @@ public class AuthServiceImpl implements AuthService {
     public Mono<JwtAuthResponse> refreshToken(String refreshToken) {
         return Mono.just(refreshToken)
                 .filter(tokenProvider::validateToken)
+                .doOnNext(token-> System.out.println("token = " + token))
                 .switchIfEmpty(Mono.error(new BlogAPIException(HttpStatus.BAD_REQUEST, "Invalid refresh token")))
+                .doOnNext(validToken -> System.out.println("Valid token: " + validToken))
                 .flatMap(validToken -> {
-                    String username = tokenProvider.extractUsername(refreshToken);
+                    String username = tokenProvider.extractUsername(validToken);
+                    System.out.println("username = " + username);
                     return userRepository.findByUsername(username)
                             .switchIfEmpty(Mono.error(new ResourceNotFoundException("User", "username", username)))
+                            .doOnNext(user -> System.out.println("User: " + user))
                             .flatMap(user -> userDetailsService.findByUsername(username)
+                                    .doOnNext(userDetails -> System.out.println("User details: " + userDetails))
                                     .flatMap(userDetails -> ReactiveSecurityContextHolder.getContext()
+                                            .doOnNext(securityContext -> System.out.println("securityContext = " + securityContext))
                                             .flatMap(securityContext -> {
                                                 System.out.println("securityContext.getAuthentication() = " + securityContext.getAuthentication());
                                                 if (tokenProvider.isTokenValid(refreshToken, userDetails)) {
