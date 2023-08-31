@@ -18,5 +18,4 @@ public interface UserRepository extends R2dbcRepository<User,Long> {
     Flux<User> findAllByEnabledIsFalse();
     Mono<Long> findIdByUsername(String username);
     Flux<User> findAllByIdIn(List<Long> ids);
-    //    //напиши мне метод который вернет список username на основе переданного списка id
 }

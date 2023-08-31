@@ -2,8 +2,10 @@ package kz.adem.gatewayservice.entity;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Set;
 
@@ -21,6 +23,8 @@ public class User {
     private String email;
     private String password;
     private boolean enabled;
-    private Date createdAt;
-    private Set<Role> roles;
+
+    private Timestamp createdAt;
+    private Long roleId;
+//    private Set<Role> roles;
 }

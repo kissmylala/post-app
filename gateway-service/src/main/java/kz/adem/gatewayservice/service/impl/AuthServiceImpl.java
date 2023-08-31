@@ -3,7 +3,6 @@ package kz.adem.gatewayservice.service.impl;
 import kz.adem.gatewayservice.dto.JwtAuthResponse;
 import kz.adem.gatewayservice.dto.LoginDto;
 import kz.adem.gatewayservice.dto.RegisterDto;
-import kz.adem.gatewayservice.entity.Role;
 import kz.adem.gatewayservice.entity.Token;
 import kz.adem.gatewayservice.entity.User;
 import kz.adem.gatewayservice.exception.BlogAPIException;
@@ -21,14 +20,12 @@ import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.sql.Timestamp;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 @Service
 @AllArgsConstructor
@@ -42,6 +39,7 @@ public class AuthServiceImpl implements AuthService {
     private JwtTokenProvider tokenProvider;
     private TokenRepository tokenRepository;
     private ReactiveUserDetailsService userDetailsService;
+    private static final Long ROLE_USER = 2L;
 
     @Override
     public Mono<JwtAuthResponse> login(LoginDto loginDto) {
@@ -84,17 +82,16 @@ public class AuthServiceImpl implements AuthService {
                 })
 //                .switchIfEmpty(Mono.error(new BlogAPIException(HttpStatus.INTERNAL_SERVER_ERROR, "Default role not set")))
                 .flatMap(role -> {
-                    Set<Role> roles = new HashSet<>();
-                    roles.add(role);
                     User newUser = User.builder()
                             .name(registerDto.getName())
                             .username(registerDto.getUsername())
                             .email(registerDto.getEmail())
                             .password(passwordEncoder.encode(registerDto.getPassword()))
-                            .roles(roles)
-                            .createdAt(new Date())
+                            .roleId(ROLE_USER)
+                            .createdAt(new Timestamp(new Date().getTime()))
                             .enabled(true)
                             .build();
+
                     return userRepository.save(newUser);
                 })
                 .thenReturn("User registered successfully!");
@@ -130,22 +127,28 @@ public class AuthServiceImpl implements AuthService {
                     String username = tokenProvider.extractUsername(refreshToken);
                     return userRepository.findByUsername(username)
                             .switchIfEmpty(Mono.error(new ResourceNotFoundException("User", "username", username)))
-                            .flatMap(user -> {
-                                UserDetails userDetails = userDetailsService.findByUsername(username).block();
-                                if (tokenProvider.isTokenValid(refreshToken, userDetails)) {
-                                    revokeAllUsersToken(user);
-                                    String newAccessToken = tokenProvider.generateToken(SecurityContextHolder.getContext().getAuthentication(), user.getId());
-                                    String newRefreshToken = tokenProvider.generateRefreshToken(SecurityContextHolder.getContext().getAuthentication(), user.getId());
-                                    saveUserToken(user, newAccessToken);
-                                    return Mono.just(JwtAuthResponse.builder()
-                                            .accessToken(newAccessToken)
-                                            .refreshToken(newRefreshToken)
-                                            .build());
-                                } else {
-                                    return Mono.error(new BlogAPIException(HttpStatus.BAD_REQUEST, "Invalid refresh token"));
-                                }
-                            });
+                            .flatMap(user -> userDetailsService.findByUsername(username)
+                                    .flatMap(userDetails -> ReactiveSecurityContextHolder.getContext()
+                                            .flatMap(securityContext -> {
+                                                System.out.println("securityContext.getAuthentication() = " + securityContext.getAuthentication());
+                                                if (tokenProvider.isTokenValid(refreshToken, userDetails)) {
+                                                    revokeAllUsersToken(user);
+                                                    String newAccessToken = tokenProvider.generateToken(securityContext.getAuthentication(), user.getId());
+                                                    System.out.println("newAccessToken = " + newAccessToken);
+                                                    String newRefreshToken = tokenProvider.generateRefreshToken(securityContext.getAuthentication(), user.getId());
+                                                    System.out.println("newRefreshToken = " + newRefreshToken);
+                                                    saveUserToken(user, newAccessToken);
+                                                    return Mono.just(JwtAuthResponse.builder()
+                                                            .accessToken(newAccessToken)
+                                                            .refreshToken(newRefreshToken)
+                                                            .build());
+                                                } else {
+                                                    return Mono.error(new BlogAPIException(HttpStatus.BAD_REQUEST, "Invalid refresh token"));
+                                                }
+                                            })));
                 });
     }
+
+
 
 }

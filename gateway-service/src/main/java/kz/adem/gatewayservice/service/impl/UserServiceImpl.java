@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -79,13 +80,13 @@ public class UserServiceImpl implements UserService {
     }
     private Mono<UserDto> createUserWithRole(UserDto userDto, String roleName){
         User newUser = UserMapper.MAPPER.mapToEntity(userDto);
-        newUser.setCreatedAt(new Date());
+        newUser.setCreatedAt(new Timestamp(new Date().getTime()));
         newUser.setEnabled(true);
         return roleRepository.findByName(roleName)
                 .doOnNext(role -> {
                     Set<Role> roles = new HashSet<>();
                     roles.add(role);
-                    newUser.setRoles(roles);
+                    newUser.setRoleId(role.getId());
                 })
                 .flatMap(role -> userRepository.save(newUser))
                 .map(UserMapper.MAPPER::mapToDto);

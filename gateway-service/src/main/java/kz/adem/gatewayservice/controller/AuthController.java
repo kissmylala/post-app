@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -23,26 +24,26 @@ public class AuthController {
 
     //Build login Rest API
     @PostMapping(value = {"/login","/signin"})
-    public Mono<ResponseEntity<JwtAuthResponse>> login(@RequestBody LoginDto loginDto){
-        return authService.login(loginDto)
-                .map(ResponseEntity::ok);
+    @ResponseStatus(HttpStatus.OK)
+    public Mono<JwtAuthResponse> login(@RequestBody LoginDto loginDto){
+        return authService.login(loginDto);
     }
 
     //Build register Rest API
     @PostMapping(value = {"/register","/signup"})
-    public Mono<ResponseEntity<String>> register(@RequestBody RegisterDto registerDto){
-        return authService.register(registerDto)
-                .map(response -> ResponseEntity.status(HttpStatus.CREATED).body(response));
+    @ResponseStatus(HttpStatus.CREATED)
+    public Mono<String> register(@RequestBody RegisterDto registerDto){
+        return authService.register(registerDto);
 
     }
     @GetMapping("/refresh-token")
-    public Mono<ResponseEntity<JwtAuthResponse>> refreshToken(HttpServletRequest request){
-        String refreshToken = request.getHeader(HttpHeaders.AUTHORIZATION);
+    @ResponseStatus(HttpStatus.OK)
+    public Mono<JwtAuthResponse> refreshToken(ServerWebExchange request){
+        String refreshToken = request.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         if (StringUtils.hasText(refreshToken) && refreshToken.startsWith("Bearer ")) {
             refreshToken = refreshToken.substring(7);
         }
 
-        return authService.refreshToken(refreshToken)
-                .map(ResponseEntity::ok);
+        return authService.refreshToken(refreshToken);
     }
 }

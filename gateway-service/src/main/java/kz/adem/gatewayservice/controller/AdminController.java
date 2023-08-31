@@ -26,38 +26,34 @@ public class AdminController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/users/enabled")
-    public Flux<ResponseEntity<UserDto>> getAllEnabledUsers(){
-        return userService.getAllByEnabledIsTrue()
-                .map(ResponseEntity::ok);
+    @ResponseStatus(HttpStatus.OK)
+    public Flux<UserDto> getAllEnabledUsers(){
+        return userService.getAllByEnabledIsTrue();
     }
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/users/banned")
-    public Flux<ResponseEntity<UserDto>> getAllBannedUsers(){
-       return userService.getAllByEnabledIsFalse()
-               .map(ResponseEntity::ok);
+    @ResponseStatus(HttpStatus.OK)
+    public Flux<UserDto> getAllBannedUsers(){
+       return userService.getAllByEnabledIsFalse();
     }
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/ban/{username}")
-    public Mono<ResponseEntity<String>> banUser(@PathVariable(value = "username") String username){
-        return userService.banUser(username)
-                .map(ResponseEntity::ok);
+    @ResponseStatus(HttpStatus.OK)
+    public Mono<String> banUser(@PathVariable(value = "username") String username){
+        return userService.banUser(username);
     }
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping
-    public Mono<ResponseEntity<UserDto>> createUser(@RequestBody UserDto userDto){
-        return userService.createUser(userDto)
-                .map(ResponseEntity::ok);
+    @ResponseStatus(HttpStatus.CREATED)
+    public Mono<UserDto> createUser(@RequestBody UserDto userDto){
+        return userService.createUser(userDto);
     }
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/createAdmin")
-    public Mono<ResponseEntity<UserDto>> createAdmin(@RequestBody UserDto userDto,@RequestParam(required = false) String secret){
-
-        if (!StringUtils.hasText(secret) || !secret.equals(ADMIN_SECRET)){
-            return Mono.just(new ResponseEntity<>(HttpStatus.FORBIDDEN));
-        }
+    @ResponseStatus(HttpStatus.CREATED)
+    public Mono<UserDto> createAdmin(@RequestBody UserDto userDto){
         userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        return  userService.createUser(userDto)
-                .map(ResponseEntity::ok);
+        return  userService.createUser(userDto);
     }
 
 

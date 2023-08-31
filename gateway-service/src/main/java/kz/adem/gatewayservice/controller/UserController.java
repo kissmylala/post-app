@@ -21,41 +21,42 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/all")
-    public Flux<ResponseEntity<UserDto>> getAllUsers(){
-        return userService.getAllUsers()
-                .map(ResponseEntity::ok);
+    @ResponseStatus(HttpStatus.OK)
+    public Flux<UserDto> getAllUsers(){
+        return userService.getAllUsers();
     }
 
     @GetMapping("/{email}")
-    public Mono<ResponseEntity<UserDto>> getUserByEmail(@PathVariable(value = "email") String email){
-        return userService.getUserByEmail(email)
-                .map(ResponseEntity::ok);
+    @ResponseStatus(HttpStatus.OK)
+    public Mono<UserDto> getUserByEmail(@PathVariable(value = "email") String email){
+        return userService.getUserByEmail(email);
+
     }
 
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<UserDto>> getUserById(@PathVariable(value = "id") Long userId){
-        return userService.getUserById(userId)
-                .map(ResponseEntity::ok);
+    @ResponseStatus(HttpStatus.OK)
+    public Mono<UserDto> getUserById(@PathVariable(value = "id") Long userId){
+        return userService.getUserById(userId);
     }
     @GetMapping("/username/{username}")
-    public Mono<ResponseEntity<UserDto>> getUserByUsername(@PathVariable(value = "username") String username){
-        return userService.getUserByUsername(username)
-                .map(ResponseEntity::ok);
+    @ResponseStatus(HttpStatus.OK)
+    public Mono<UserDto> getUserByUsername(@PathVariable(value = "username") String username){
+        return userService.getUserByUsername(username);
     }
 
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<UserDto>> updateUser(@PathVariable(value = "id") Long userId, @RequestBody UserDto userDto,
+    @ResponseStatus(HttpStatus.OK)
+    public Mono<UserDto> updateUser(@PathVariable(value = "id") Long userId, @RequestBody UserDto userDto,
                                               ServerWebExchange webExchange){
         String username = webExchange.getRequest().getHeaders().getFirst("user");
         if (username.equals(userDto.getUsername())){
-            return userService.updateUser(userId,userDto)
-                    .map(ResponseEntity::ok);
+            return userService.updateUser(userId,userDto);
         }
         return Mono.error(new AccessDeniedException("Access denied"));
     }
     @PostMapping("/liked/usernames")
-    public Flux<ResponseEntity<String>> getAllUsernamesByIdIn(@RequestBody List<Long> ids){
-        return userService.getAllUsernamesByIdIn(ids)
-                .map(ResponseEntity::ok);
+    @ResponseStatus(HttpStatus.OK)
+    public Flux<String> getAllUsernamesByIdIn(@RequestBody List<Long> ids){
+        return userService.getAllUsernamesByIdIn(ids);
     }
 }
