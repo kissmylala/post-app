@@ -149,5 +149,9 @@ public class UserServiceImpl implements UserService {
                 .map(User::getUsername);
     }
 
-
+    @Override
+    public Flux<UserDto> getAllUsersByIdIn(List<Long> ids) {
+        return userRepository.findAllByIdIn(ids)
+                .map(UserMapper.MAPPER::mapToDto);
+    }
 }

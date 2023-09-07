@@ -38,6 +38,4 @@ public class Post {
     private String username;
     @Column(name = "likes")
     private Long likes;
-
-
 }

@@ -5,15 +5,16 @@ import kz.adem.postservice.dto.CommentDto;
 import kz.adem.postservice.dto.PostCommentDto;
 import kz.adem.postservice.dto.PostDto;
 
-import kz.adem.postservice.exception.UnauthorizedAccessException;
 import kz.adem.postservice.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import static kz.adem.util.ControllerUtils.getUserIdFromRequest;
+import static kz.adem.util.ControllerUtils.getUsernameFromRequest;
 
 @RestController
 @RequiredArgsConstructor
@@ -61,27 +62,7 @@ public class PostController {
         String response = postService.deletePostById(postId,username);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
-    @PutMapping("/{postId}/like")
-    public ResponseEntity<PostDto> likePost(@PathVariable(value = "postId") Long postId,HttpServletRequest request){
-        String username = getUsernameFromRequest(request);
-        Long userId = getUserIdFromRequest(request);
-        postService.likePost(userId,postId);
-        PostDto likedPost = postService.getPostById(postId);
-        return new ResponseEntity<>(likedPost,HttpStatus.OK);
-    }
-    @PutMapping("/{postId}/unlike")
-    public ResponseEntity<PostDto> unlikePost(@PathVariable(value = "postId") Long postId,HttpServletRequest request){
-        String username = getUsernameFromRequest(request);
-        Long userId = getUserIdFromRequest(request);
-        postService.unlikePost(userId,postId);
-        PostDto likedPost = postService.getPostById(postId);
-        return new ResponseEntity<>(likedPost,HttpStatus.OK);
-    }
-    @GetMapping("/{postId}/likers")
-    public ResponseEntity<List<String>> getPostLikers(@PathVariable(value = "postId") Long postId){
-        List<String> postLikers = postService.getPostLikers(postId);
-        return new ResponseEntity<>(postLikers,HttpStatus.OK);
-    }
+
     @GetMapping("/{postId}/exists")
     public ResponseEntity<Boolean> existsBydId(@PathVariable(value = "postId") Long postId){
         Boolean exists = postService.existsBydId(postId);
@@ -127,20 +108,7 @@ public class PostController {
         CommentDto updatedComment = postService.updateComment(postId,commentId,commentDto,username,userId);
         return new ResponseEntity<>(updatedComment,HttpStatus.OK);
     }
-    private String getUsernameFromRequest(HttpServletRequest request){
-        String username =  request.getHeader("user");
-        if (!StringUtils.hasText(username)){
-            throw new UnauthorizedAccessException("Unauthorized access");
-        }
-        return username;
-    }
-    private Long getUserIdFromRequest(HttpServletRequest request){
-        Long userId = Long.parseLong(request.getHeader("user_id"));
-        if (userId == null){
-            throw new UnauthorizedAccessException("Unauthorized access");
-        }
-        return userId;
-    }
+
     @PutMapping("/{postId}/comments/{commentId}/like")
     public ResponseEntity<CommentDto> likeComment(@PathVariable(value = "postId") Long postId,
                                                    @PathVariable(value = "commentId") Long commentId,
