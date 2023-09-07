@@ -1,4 +1,4 @@
-package kz.adem.postservice.service;
+package kz.adem.postservice.feign;
 
 import kz.adem.postservice.dto.UserDto;
 import org.springframework.cloud.openfeign.FeignClient;

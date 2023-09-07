@@ -7,7 +7,7 @@ import kz.adem.postservice.exception.ResourceNotFoundException;
 import kz.adem.postservice.repository.LikeRepository;
 import kz.adem.postservice.repository.PostRepository;
 import kz.adem.postservice.service.LikeService;
-import kz.adem.postservice.service.UserClient;
+import kz.adem.postservice.feign.UserClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -13,8 +13,8 @@ public interface CommentService {
     String deleteComment(Long postId, Long commentId, String username, Long userId);
     CommentDto updateComment(Long postId, Long commentId, CommentDto commentDto,String username, Long userId);
     CommentDto getCommentById(Long commentId);
-    CommentDto likeComment(Long userId, Long commentId);
-    CommentDto unlikeComment(Long userId, Long commentId);
-    List<String> getCommentLikers(Long commentId);
+//    CommentDto likeComment(Long userId, Long commentId);
+//    CommentDto unlikeComment(Long userId, Long commentId);
+//    List<String> getCommentLikers(Long commentId);
 
 }
