@@ -54,18 +54,7 @@ public class CommentController {
     public ResponseEntity<CommentDto> getCommentById(@PathVariable("commentId") Long commentId){
         return ResponseEntity.ok(commentService.getCommentById(commentId));
     }
-    @GetMapping("/{commentId}/likers")
-    public ResponseEntity<List<String>> getCommentLikers(@PathVariable("commentId") Long commentId){
-        return ResponseEntity.ok(commentService.getCommentLikers(commentId));
-    }
-    @PutMapping("/{commentId}/like")
-    public ResponseEntity<CommentDto> likeComment(@PathVariable("commentId") Long commentId,@RequestParam("userId") Long userId){
-        return ResponseEntity.ok(commentService.likeComment(commentId,userId));
-    }
-    @PutMapping("/{commentId}/unlike")
-    public ResponseEntity<CommentDto> unlikeComment(@PathVariable("commentId") Long commentId,@RequestParam("userId") Long userId){
-        return ResponseEntity.ok(commentService.unlikeComment(commentId,userId));
-    }
+
 
     }
 

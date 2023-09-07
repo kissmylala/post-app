@@ -6,10 +6,9 @@ import kz.adem.postservice.exception.ResourceNotFoundException;
 import kz.adem.postservice.exception.UnauthorizedAccessException;
 import kz.adem.postservice.mapper.PostMapper;
 import kz.adem.postservice.repository.PostRepository;
-import kz.adem.postservice.service.CommentClient;
-import kz.adem.postservice.service.LikeClient;
+import kz.adem.postservice.feign.CommentClient;
 import kz.adem.postservice.service.PostService;
-import kz.adem.postservice.service.UserClient;
+import kz.adem.postservice.feign.UserClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -23,7 +22,6 @@ public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
     private final UserClient userClient;
-    private final LikeClient likeClient;
     private final CommentClient commentClient;
 
     @Override
@@ -99,13 +97,7 @@ public class PostServiceImpl implements PostService {
         return "Post with id " + id + " successfully deleted!";
     }
 
-    @Override
-    public void incrementLikes(Long postId) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new ResourceNotFoundException("Post", "id", String.valueOf(postId)));
-        post.setLikes(post.getLikes() + 1);
-        postRepository.save(post);
-    }
+
 
     @Override
     public PostDto getPostById(Long postId) {
@@ -129,66 +121,12 @@ public class PostServiceImpl implements PostService {
         return postCommentDto;
     }
 
-    @Override
-    public void likePost(Long userId, Long postId) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new ResourceNotFoundException("Post", "id", String.valueOf(postId)));
-        likeClient.likePost(userId, postId);
-        post.setLikes(post.getLikes() + 1);
-        postRepository.save(post);
-    }
-
-    @Override
-    public void unlikePost(Long userId, Long postId) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new ResourceNotFoundException("Post", "id", String.valueOf(postId)));
-        likeClient.unlikePost(userId, postId);
-        post.setLikes(post.getLikes() - 1);
-        postRepository.save(post);
-    }
 
     @Override
     public Boolean existsBydId(Long postId) {
         return postRepository.existsById(postId);
     }
 
-    @Override
-    public List<String> getPostLikers(Long postId) {
-        return likeClient.getPostLikers(postId);
-    }
 
-    @Override
-    public String createCommentToPost(CommentDto commentDto, Long postId, String username, Long userId) {
-        return commentClient.createComment(commentDto, postId, username, userId);
-    }
 
-    @Override
-    public String createReplyComment(CommentDto commentDto, Long postId, String username, Long userId, Long parentCommentId) {
-        return commentClient.createReplyComment(commentDto, postId, username, userId, parentCommentId);
-    }
-
-    @Override
-    public String deleteComment(Long postId, Long commentId, String username, Long userId) {
-        return commentClient.deleteComment(postId, commentId, username, userId);
-    }
-
-    @Override
-    public CommentDto updateComment(Long postId, Long commentId, CommentDto commentDto, String username, Long userId) {
-        return commentClient.updateComment(postId, commentId, commentDto, username, userId);
-    }
-
-    @Override
-    public CommentDto likeComment(Long userId, Long commentId) {
-     return   commentClient.likeComment(userId, commentId);
-    }
-
-    @Override
-    public CommentDto unlikeComment(Long userId, Long commentId) {
-       return  commentClient.unlikeComment(userId, commentId);
-    }
-
-    @Override
-    public List<String> getCommentLikers(Long commentId) {
-        return commentClient.getCommentLikers(commentId);
-    }
 }

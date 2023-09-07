@@ -28,7 +28,7 @@ public class LikeController {
         PostDto likedPost = postService.getPostById(postId);
         return new ResponseEntity<>(likedPost, HttpStatus.OK);
     }
-    @PostMapping("/{postId}/unlike")
+    @DeleteMapping("/{postId}/unlike")
     public ResponseEntity<PostDto> unlikePost(@PathVariable(value = "postId") Long postId,HttpServletRequest request){
         Long userId = ControllerUtils.getUserIdFromRequest(request);
         likeService.unlikePost(userId,postId);

@@ -1,7 +1,8 @@
-package kz.adem.postservice.service;
+package kz.adem.postservice.feign;
 
 import jakarta.ws.rs.Path;
 import kz.adem.postservice.dto.CommentDto;
+import kz.adem.postservice.dto.UserDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,12 +31,12 @@ public interface CommentClient {
     @GetMapping("/api/v1/comments/commentId/{commentId}")
     CommentDto getCommentById(@PathVariable("commentId") Long commentId);
 
-    @PutMapping("/api/v1/comments/{commentId}/like")
+    @PostMapping("/api/v1/comments/{commentId}/like")
     CommentDto likeComment(@PathVariable("commentId") Long commentId, @RequestParam("userId") Long userId);
 
-    @PutMapping("/api/v1/comments/{commentId}/unlike")
+    @DeleteMapping("/api/v1/comments/{commentId}/unlike")
     CommentDto unlikeComment(@PathVariable("commentId") Long commentId, @RequestParam("userId") Long userId);
 
     @GetMapping("/api/v1/comments/{commentId}/likers")
-    List<String> getCommentLikers(@PathVariable("commentId") Long commentId);
+    List<UserDto> getCommentLikers(@PathVariable("commentId") Long commentId);
 }

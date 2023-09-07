@@ -1,6 +1,5 @@
 package kz.adem.commentservice.service.impl;
 
-import jakarta.servlet.http.HttpServletRequest;
 import kz.adem.commentservice.dto.CommentDto;
 import kz.adem.commentservice.entity.Comment;
 import kz.adem.commentservice.exception.ResourceNotFoundException;
@@ -8,8 +7,7 @@ import kz.adem.commentservice.exception.UnauthorizedAccessException;
 import kz.adem.commentservice.mapper.CommentMapper;
 import kz.adem.commentservice.repository.CommentRepository;
 import kz.adem.commentservice.service.CommentService;
-import kz.adem.commentservice.service.LikeClient;
-import kz.adem.commentservice.service.PostClient;
+import kz.adem.commentservice.feign.PostClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +18,6 @@ import java.util.List;
 public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final PostClient postClient;
-    private final LikeClient likeClient;
     @Override
     public void createComment(Long postId, CommentDto commentDto) {
         if (!postClient.existsById(postId)) {
@@ -106,28 +103,4 @@ public class CommentServiceImpl implements CommentService {
         return CommentMapper.MAPPER.mapToDto(comment);
     }
 
-    @Override
-    public CommentDto likeComment(Long userId, Long commentId) {
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(()->new ResourceNotFoundException("Comment","id",String.valueOf(commentId)));
-        likeClient.likeComment(userId,commentId);
-        comment.setLikes(comment.getLikes()+1);
-        commentRepository.save(comment);
-
-        return CommentMapper.MAPPER.mapToDto(comment);
-    }
-
-    @Override
-    public CommentDto unlikeComment(Long userId, Long commentId) {
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(()->new ResourceNotFoundException("Comment","id",String.valueOf(commentId)));
-        likeClient.unlikeComment(userId,commentId);
-        comment.setLikes(comment.getLikes()-1);
-        return CommentMapper.MAPPER.mapToDto(commentRepository.save(comment));
-    }
-
-    @Override
-    public List<String> getCommentLikers(Long commentId) {
-        return likeClient.getCommentLikers(commentId);
-    }
 }

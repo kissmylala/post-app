@@ -1,10 +1,8 @@
 package kz.adem.postservice.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
-import kz.adem.postservice.dto.CommentDto;
 import kz.adem.postservice.dto.PostCommentDto;
 import kz.adem.postservice.dto.PostDto;
-
 import kz.adem.postservice.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static kz.adem.util.ControllerUtils.getUserIdFromRequest;
 import static kz.adem.util.ControllerUtils.getUsernameFromRequest;
 
 @RestController
@@ -68,68 +65,7 @@ public class PostController {
         Boolean exists = postService.existsBydId(postId);
         return new ResponseEntity<>(exists,HttpStatus.OK);
     }
-    @PostMapping("/{postId}/comments")
-    public ResponseEntity<String> createCommentToPost(@RequestBody CommentDto commentDto,
-                                                      @PathVariable(value = "postId") Long postId,
-                                                      HttpServletRequest request){
-        String username = getUsernameFromRequest(request);
-        Long userId = getUserIdFromRequest(request);
-        String response = postService.createCommentToPost(commentDto,postId,username,userId);
-        return new ResponseEntity<>(response,HttpStatus.CREATED);
-    }
-    @PostMapping("/{postId}/comments/{parentCommentId}")
-    public ResponseEntity<String> createChildCommentToComment(@RequestBody CommentDto commentDto,
-                                                      @PathVariable(value = "postId") Long postId,
-                                                      HttpServletRequest request,
-                                                      @PathVariable(value = "parentCommentId") Long parentCommentId){
-        String username = getUsernameFromRequest(request);
-        Long userId = getUserIdFromRequest(request);
-        String response = postService.createReplyComment(commentDto,postId,username,userId,parentCommentId);
-        return new ResponseEntity<>(response,HttpStatus.CREATED);
-    }
 
-    // TODO: 15.08.23 refactor getting username and userid from request
-    @DeleteMapping("/{postId}/comments/{commentId}")
-    public ResponseEntity<String> deleteComment(@PathVariable(value = "postId") Long postId,
-                                                @PathVariable(value = "commentId") Long commentId,
-                                                HttpServletRequest request){
-        String username = getUsernameFromRequest(request);
-        Long userId = getUserIdFromRequest(request);
-        String response = postService.deleteComment(postId,commentId,username,userId);
-        return new ResponseEntity<>(response,HttpStatus.OK);
-    }
-    @PutMapping("/{postId}/comments/{commentId}")
-    public ResponseEntity<CommentDto> updateComment(@PathVariable("postId") Long postId,
-                                                    @PathVariable("commentId") Long commentId,
-                                                    @RequestBody CommentDto commentDto,
-                                                    HttpServletRequest request){
-        String username = getUsernameFromRequest(request);
-        Long userId = getUserIdFromRequest(request);
-        CommentDto updatedComment = postService.updateComment(postId,commentId,commentDto,username,userId);
-        return new ResponseEntity<>(updatedComment,HttpStatus.OK);
-    }
-
-    @PutMapping("/{postId}/comments/{commentId}/like")
-    public ResponseEntity<CommentDto> likeComment(@PathVariable(value = "postId") Long postId,
-                                                   @PathVariable(value = "commentId") Long commentId,
-                                                   HttpServletRequest request){
-        Long userId = getUserIdFromRequest(request);
-        CommentDto likedComment = postService.likeComment(userId,commentId);
-        return new ResponseEntity<>(likedComment,HttpStatus.OK);
-    }
-    @PutMapping("/{postId}/comments/{commentId}/unlike")
-    public ResponseEntity<CommentDto> unlikeComment(@PathVariable(value = "postId") Long postId,
-                                                  @PathVariable(value = "commentId") Long commentId,
-                                                  HttpServletRequest request){
-        Long userId = getUserIdFromRequest(request);
-        CommentDto likedComment = postService.unlikeComment(userId,commentId);
-        return new ResponseEntity<>(likedComment,HttpStatus.OK);
-    }
-    @GetMapping("/{postId}/comments/{commentId}/likers")
-    public ResponseEntity<List<String>> getCommentLikers(@PathVariable("commentId") Long commentId){
-        List<String> commentLikers = postService.getCommentLikers(commentId);
-        return new ResponseEntity<>(commentLikers,HttpStatus.OK);
-    }
 
 
 
