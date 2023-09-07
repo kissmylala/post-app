@@ -29,6 +29,7 @@ public class CustomUserDetailsService implements ReactiveUserDetailsService {
                         .map(role -> {
                             Set<GrantedAuthority> authorities = new HashSet<>();
                             authorities.add(new SimpleGrantedAuthority(role.getName()));
+                            System.out.println(authorities);
                             return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),authorities);
                         }));
 

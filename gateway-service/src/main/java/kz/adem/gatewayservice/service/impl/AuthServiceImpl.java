@@ -17,9 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -122,38 +120,29 @@ public class AuthServiceImpl implements AuthService {
     public Mono<JwtAuthResponse> refreshToken(String refreshToken) {
         return Mono.just(refreshToken)
                 .filter(tokenProvider::validateToken)
-                .doOnNext(token-> System.out.println("token = " + token))
                 .switchIfEmpty(Mono.error(new BlogAPIException(HttpStatus.BAD_REQUEST, "Invalid refresh token")))
-                .doOnNext(validToken -> System.out.println("Valid token: " + validToken))
                 .flatMap(validToken -> {
                     String username = tokenProvider.extractUsername(validToken);
-                    System.out.println("username = " + username);
                     return userRepository.findByUsername(username)
                             .switchIfEmpty(Mono.error(new ResourceNotFoundException("User", "username", username)))
-                            .doOnNext(user -> System.out.println("User: " + user))
                             .flatMap(user -> userDetailsService.findByUsername(username)
-                                    .doOnNext(userDetails -> System.out.println("User details: " + userDetails))
-                                    .flatMap(userDetails -> ReactiveSecurityContextHolder.getContext()
-                                            .doOnNext(securityContext -> System.out.println("securityContext = " + securityContext))
-                                            .flatMap(securityContext -> {
-                                                System.out.println("securityContext.getAuthentication() = " + securityContext.getAuthentication());
-                                                if (tokenProvider.isTokenValid(refreshToken, userDetails)) {
-                                                    revokeAllUsersToken(user);
-                                                    String newAccessToken = tokenProvider.generateToken(securityContext.getAuthentication(), user.getId());
-                                                    System.out.println("newAccessToken = " + newAccessToken);
-                                                    String newRefreshToken = tokenProvider.generateRefreshToken(securityContext.getAuthentication(), user.getId());
-                                                    System.out.println("newRefreshToken = " + newRefreshToken);
-                                                    saveUserToken(user, newAccessToken);
-                                                    return Mono.just(JwtAuthResponse.builder()
-                                                            .accessToken(newAccessToken)
-                                                            .refreshToken(newRefreshToken)
-                                                            .build());
-                                                } else {
-                                                    return Mono.error(new BlogAPIException(HttpStatus.BAD_REQUEST, "Invalid refresh token"));
-                                                }
-                                            })));
+                                    .flatMap(userDetails -> {
+                                        if (tokenProvider.isTokenValid(refreshToken, userDetails)) {
+                                            revokeAllUsersToken(user);
+                                            String newAccessToken = tokenProvider.generateToken(userDetails.getUsername(), user.getId());
+                                            String newRefreshToken = tokenProvider.generateRefreshToken(userDetails.getUsername(), user.getId());
+                                            saveUserToken(user, newAccessToken);
+                                            return Mono.just(JwtAuthResponse.builder()
+                                                    .accessToken(newAccessToken)
+                                                    .refreshToken(newRefreshToken)
+                                                    .build());
+                                        } else {
+                                            return Mono.error(new BlogAPIException(HttpStatus.BAD_REQUEST, "Invalid refresh token"));
+                                        }
+                                    }));
                 });
     }
+
 
 
 

@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 @RequiredArgsConstructor
 //@EnableFeignClients
+
 public class GatewayServiceApplication {
 
 //    private final GatewayFilter jwtTokenFilter;

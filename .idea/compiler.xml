@@ -10,7 +10,7 @@
         <module name="registry-service" />
         <module name="like-service" />
       </profile>
-      <profile name="Annotation profile for gateway-service" enabled="true">
+      <profile name="Annotation profile for post-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
