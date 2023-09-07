@@ -6,7 +6,6 @@ import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-
 public interface TokenRepository extends R2dbcRepository<Token, Integer> {
 
     @Query(value = """

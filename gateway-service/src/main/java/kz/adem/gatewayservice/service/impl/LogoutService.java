@@ -3,8 +3,7 @@ package kz.adem.gatewayservice.service.impl;
 import kz.adem.gatewayservice.repository.TokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.server.ServerHttpRequest;
-import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.web.server.WebFilterExchange;
@@ -21,7 +20,7 @@ public class LogoutService implements ServerLogoutHandler {
 
     @Override
     public Mono<Void> logout(WebFilterExchange exchange, Authentication authentication) {
-        ServerHttpRequest request = (ServerHttpRequest) exchange.getExchange().getRequest();
+        ServerHttpRequest request =  exchange.getExchange().getRequest();
         final String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         final String jwt;
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {

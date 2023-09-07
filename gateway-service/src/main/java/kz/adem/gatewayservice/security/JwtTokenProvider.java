@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +29,6 @@ public class JwtTokenProvider {
 
     public String generateToken(Authentication authentication,Long id){
         String username = authentication.getName();
-//        Long id = userService.getUserIdByUsername(username);
         Map<String,Object> claims = new HashMap<>();
         claims.put("token_type","access_token");
         claims.put("user_id",String.valueOf(id));
@@ -38,8 +38,19 @@ public class JwtTokenProvider {
                 .setExpiration(new Date(System.currentTimeMillis()+accessTokenExpirationDate))
                 .signWith(key())
                 .compact();
-        String tokenWithClaims = addClaimsToToken(token,claims);
-        return tokenWithClaims;
+        return addClaimsToToken(token,claims);
+    }
+    public String generateToken(String username,Long id){
+        Map<String,Object> claims = new HashMap<>();
+        claims.put("token_type","access_token");
+        claims.put("user_id",String.valueOf(id));
+        String token = Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis()+accessTokenExpirationDate))
+                .signWith(key())
+                .compact();
+        return addClaimsToToken(token,claims);
     }
     public String generateRefreshToken(Authentication authentication,Long id){
         String username = authentication.getName();
@@ -52,17 +63,27 @@ public class JwtTokenProvider {
                 .setExpiration(new Date(System.currentTimeMillis()+refreshTokenExpirationDate))
                 .signWith(key())
                 .compact();
-        String tokenWithClaims = addClaimsToToken(token,claims);
-        return tokenWithClaims;
+        return addClaimsToToken(token,claims);
+    }
+    public String generateRefreshToken(String username,Long id){
+        Map<String,Object> claims = new HashMap<>();
+        claims.put("token_type","refresh_token");
+        claims.put("user_id",String.valueOf(id));
+        String token = Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis()+refreshTokenExpirationDate))
+                .signWith(key())
+                .compact();
+        return addClaimsToToken(token,claims);
     }
     public String addClaimsToToken(String token, Map<String,Object> additionalClaims){
         Claims claims = extractAllClaims(token);
         claims.putAll(additionalClaims);
-        String tokenWithClaims = Jwts.builder()
+        return Jwts.builder()
                 .setClaims(claims)
                 .signWith(key())
                 .compact();
-        return tokenWithClaims;
     }
 
     private Key key(){
@@ -93,7 +114,7 @@ public class JwtTokenProvider {
         return extractClaim(token,Claims::getExpiration);
     }
     public boolean isTokenExpired(String token){
-        return extractExpiration(token).before(new Date());
+        return extractExpiration(token).before(new Timestamp(new Date().getTime()));
     }
     public boolean validateToken(String token){
         try {

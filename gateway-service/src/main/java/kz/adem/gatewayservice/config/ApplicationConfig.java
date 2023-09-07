@@ -11,28 +11,21 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 @RequiredArgsConstructor
 public class ApplicationConfig {
-    private final GatewayFilter jwtTokenFilter;
 
     @Bean
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
         return builder.routes()
                 .route("user_service_route", r -> r.path("/api/v1/users/**")
-                        .filters(f -> f.filter(jwtTokenFilter))
                         .uri("lb://USER-SERVICE"))
                 .route("post_service_route", r -> r.path("/api/v1/posts/**")
-                        .filters(f -> f.filter(jwtTokenFilter))
                         .uri("lb://POST-SERVICE"))
                 .route("user_service_auth",r -> r.path("/api/auth/**")
-                        .filters(f -> f.filter(jwtTokenFilter))
                         .uri("lb://USER-SERVICE"))
                 .route("user_service_admin",r -> r.path("/api/v1/admin/**")
-                        .filters(f -> f.filter(jwtTokenFilter))
                         .uri("lb://USER-SERVICE"))
                 .route("post_like_service",r -> r.path("/api/v1/like/**")
-                        .filters(f -> f.filter(jwtTokenFilter))
                         .uri("lb://LIKE-SERVICE"))
                 .route("post_comment_service",r -> r.path("/api/v1/comments/**")
-                        .filters(f -> f.filter(jwtTokenFilter))
                         .uri("lb://COMMENT-SERVICE"))
                 .build();
     }
