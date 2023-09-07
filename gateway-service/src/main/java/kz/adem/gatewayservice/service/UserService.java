@@ -21,6 +21,7 @@ public interface UserService {
     Mono<UserDto> createAdmin(UserDto userDto);
     Mono<String> banUser(String username);
     Flux<String> getAllUsernamesByIdIn(List<Long> ids);
+    Flux<UserDto> getAllUsersByIdIn(List<Long> ids);
 
 
 

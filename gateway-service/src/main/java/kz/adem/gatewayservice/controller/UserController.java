@@ -59,4 +59,9 @@ public class UserController {
     public Flux<String> getAllUsernamesByIdIn(@RequestBody List<Long> ids){
         return userService.getAllUsernamesByIdIn(ids);
     }
+    @PostMapping("/liked/users")
+    @ResponseStatus(HttpStatus.OK)
+    public Flux<UserDto> getAllUsersByIdIn(@RequestBody List<Long> ids){
+        return userService.getAllUsersByIdIn(ids);
+    }
 }

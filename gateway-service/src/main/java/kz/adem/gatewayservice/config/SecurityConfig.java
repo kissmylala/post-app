@@ -40,7 +40,8 @@ public class SecurityConfig {
                     return Mono.empty();
                 }))
                 .authorizeExchange(exchange -> exchange
-                        .pathMatchers("/api/auth/login", "/api/auth/register", "/api/auth/logout", "/api/token/**", "/api/v1/like/**", "/api/v1/comments/**", "/api/v1/users/liked/usernames").permitAll()
+                        .pathMatchers("/api/auth/login", "/api/auth/register", "/api/auth/logout", "/api/token/**", "/api/v1/like/**", "/api/v1/comments/**", "/api/v1/users/liked/usernames"
+                        ,"/api/v1/users/liked/users").permitAll()
                         .pathMatchers(HttpMethod.GET,"/api/v1/users/**").permitAll()
                         .anyExchange().authenticated())
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
