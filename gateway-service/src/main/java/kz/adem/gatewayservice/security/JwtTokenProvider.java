@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Component
-
 public class JwtTokenProvider {
     @Value("${app.jwt-secret}")
     private String jwtSecret;
@@ -25,58 +24,93 @@ public class JwtTokenProvider {
     @Value("${app.refresh-token-expiration-milliseconds}")
     private Long refreshTokenExpirationDate;
 
+    private static final String TOKEN_TYPE = "token_type";
+    private static final String USER_ID = "user_id";
+
+    private static final String ACCESS_TOKEN = "access_token";
+    private static final String REFRESH_TOKEN = "refresh_token";
 
 
-    public String generateToken(Authentication authentication,Long id){
-        String username = authentication.getName();
-        Map<String,Object> claims = new HashMap<>();
-        claims.put("token_type","access_token");
-        claims.put("user_id",String.valueOf(id));
+    public String generateToken(Authentication authentication, Long id) {
+        return generateToken(authentication.getName(), ACCESS_TOKEN, id, accessTokenExpirationDate);
+    }
+
+    public String generateToken(String username, Long id) {
+        return generateToken(username, ACCESS_TOKEN, id, accessTokenExpirationDate);
+    }
+
+    public String generateRefreshToken(Authentication authentication, Long id) {
+        return generateToken(authentication.getName(), REFRESH_TOKEN, id, refreshTokenExpirationDate);
+    }
+
+    public String generateRefreshToken(String username, Long id) {
+        return generateToken(username, REFRESH_TOKEN, id, refreshTokenExpirationDate);
+    }
+
+    private String generateToken(String username, String tokenType, Long id, Long expirationDate) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put(TOKEN_TYPE, tokenType);
+        claims.put(USER_ID, String.valueOf(id));
         String token = Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis()+accessTokenExpirationDate))
+                .setExpiration(new Date(System.currentTimeMillis() + expirationDate))
                 .signWith(key())
                 .compact();
-        return addClaimsToToken(token,claims);
+        return addClaimsToToken(token, claims);
     }
-    public String generateToken(String username,Long id){
-        Map<String,Object> claims = new HashMap<>();
-        claims.put("token_type","access_token");
-        claims.put("user_id",String.valueOf(id));
-        String token = Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis()+accessTokenExpirationDate))
-                .signWith(key())
-                .compact();
-        return addClaimsToToken(token,claims);
-    }
-    public String generateRefreshToken(Authentication authentication,Long id){
-        String username = authentication.getName();
-        Map<String,Object> claims = new HashMap<>();
-        claims.put("token_type","refresh_token");
-        claims.put("user_id",String.valueOf(id));
-        String token = Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis()+refreshTokenExpirationDate))
-                .signWith(key())
-                .compact();
-        return addClaimsToToken(token,claims);
-    }
-    public String generateRefreshToken(String username,Long id){
-        Map<String,Object> claims = new HashMap<>();
-        claims.put("token_type","refresh_token");
-        claims.put("user_id",String.valueOf(id));
-        String token = Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis()+refreshTokenExpirationDate))
-                .signWith(key())
-                .compact();
-        return addClaimsToToken(token,claims);
-    }
+
+
+    //    public String generateToken(Authentication authentication,Long id){
+//        String username = authentication.getName();
+//        Map<String,Object> claims = new HashMap<>();
+//        claims.put("token_type","access_token");
+//        claims.put("user_id",String.valueOf(id));
+//        String token = Jwts.builder()
+//                .setSubject(username)
+//                .setIssuedAt(new Date(System.currentTimeMillis()))
+//                .setExpiration(new Date(System.currentTimeMillis()+accessTokenExpirationDate))
+//                .signWith(key())
+//                .compact();
+//        return addClaimsToToken(token,claims);
+//    }
+//    public String generateToken(String username,Long id){
+//        Map<String,Object> claims = new HashMap<>();
+//        claims.put("token_type","access_token");
+//        claims.put("user_id",String.valueOf(id));
+//        String token = Jwts.builder()
+//                .setSubject(username)
+//                .setIssuedAt(new Date(System.currentTimeMillis()))
+//                .setExpiration(new Date(System.currentTimeMillis()+accessTokenExpirationDate))
+//                .signWith(key())
+//                .compact();
+//        return addClaimsToToken(token,claims);
+//    }
+//    public String generateRefreshToken(Authentication authentication,Long id){
+//        String username = authentication.getName();
+//        Map<String,Object> claims = new HashMap<>();
+//        claims.put("token_type","refresh_token");
+//        claims.put("user_id",String.valueOf(id));
+//        String token = Jwts.builder()
+//                .setSubject(username)
+//                .setIssuedAt(new Date(System.currentTimeMillis()))
+//                .setExpiration(new Date(System.currentTimeMillis()+refreshTokenExpirationDate))
+//                .signWith(key())
+//                .compact();
+//        return addClaimsToToken(token,claims);
+//    }
+//    public String generateRefreshToken(String username,Long id){
+//        Map<String,Object> claims = new HashMap<>();
+//        claims.put("token_type","refresh_token");
+//        claims.put("user_id",String.valueOf(id));
+//        String token = Jwts.builder()
+//                .setSubject(username)
+//                .setIssuedAt(new Date(System.currentTimeMillis()))
+//                .setExpiration(new Date(System.currentTimeMillis()+refreshTokenExpirationDate))
+//                .signWith(key())
+//                .compact();
+//        return addClaimsToToken(token,claims);
+//    }
     public String addClaimsToToken(String token, Map<String,Object> additionalClaims){
         Claims claims = extractAllClaims(token);
         claims.putAll(additionalClaims);
@@ -92,15 +126,14 @@ public class JwtTokenProvider {
         );
     }
     private Claims extractAllClaims(String token){
-        Claims claims = Jwts.parserBuilder()
+        return Jwts.parserBuilder()
                 .setSigningKey(key())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-        return claims;
     }
     public String extractTokenType(String token){
-        return extractClaim(token,claims -> claims.get("token_type",String.class));
+        return extractClaim(token,claims -> claims.get(TOKEN_TYPE,String.class));
     }
     public <T> T extractClaim(String token, Function<Claims,T> claimsResolver){
         final Claims claims = extractAllClaims(token);
@@ -140,6 +173,6 @@ public class JwtTokenProvider {
     }
 
     public String extractUserId(String actualToken) {
-        return extractClaim(actualToken,claims -> claims.get("user_id",String.class));
+        return extractClaim(actualToken,claims -> claims.get(USER_ID,String.class));
     }
 }

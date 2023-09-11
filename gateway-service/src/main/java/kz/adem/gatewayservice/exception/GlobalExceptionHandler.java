@@ -7,23 +7,23 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.support.WebExchangeBindException;
 import reactor.core.publisher.Mono;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
+//Class to handle all exceptions to this service
 @ControllerAdvice
 public class GlobalExceptionHandler{
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Mono<ResponseEntity<Map<String, String>>> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
+    @ExceptionHandler(WebExchangeBindException.class)
+    public Mono<ResponseEntity<Map<String, String>>> handleMethodArgumentNotValid(WebExchangeBindException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
             String message = error.getDefaultMessage();
             errors.put(fieldName, message);
         });
-
         return Mono.just(new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST));
     }
 
@@ -41,6 +41,7 @@ public class GlobalExceptionHandler{
         ErrorDetails errorDetails = ErrorDetails.builder()
                 .timestamp(new Date())
                 .message(ex.getMessage())
+                .details("Unauthorized")
                 .build();
         return Mono.just(new ResponseEntity<>(errorDetails, HttpStatus.UNAUTHORIZED));
     }

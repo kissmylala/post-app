@@ -15,18 +15,18 @@ public class TokenValidationServiceImpl implements TokenValidationService {
 
     @Override
     public Mono<Boolean> isTokenValid(String token) {
-        System.out.println("Validating token: " + token); // Логируем токен
+        System.out.println("Validating token: " + token);
 
         return tokenRepository.findByToken(token)
-                .doOnNext(t -> System.out.println("Found token in DB: " + t.toString())) // Логируем найденный токен
+                .doOnNext(t -> System.out.println("Found token in DB: " + t.toString()))
                 .map(t -> {
                     boolean isValid = !t.isExpired() && !t.isRevoked();
                     System.out.println(isValid);
-                    System.out.println("Token isExpired: " + t.isExpired() + ", isRevoked: " + t.isRevoked()); // Логируем значения
+                    System.out.println("Token isExpired: " + t.isExpired() + ", isRevoked: " + t.isRevoked());
                     return isValid;
                 })
                 .switchIfEmpty(Mono.defer(() -> {
-                    System.out.println("Token not found in DB"); // Логируем, если токен не найден
+                    System.out.println("Token not found in DB");
                     return Mono.just(false);
                 }));
     }

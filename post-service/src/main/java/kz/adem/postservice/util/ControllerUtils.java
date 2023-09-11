@@ -1,4 +1,4 @@
-package kz.adem.util;
+package kz.adem.postservice.util;
 
 import jakarta.servlet.http.HttpServletRequest;
 import kz.adem.postservice.exception.UnauthorizedAccessException;

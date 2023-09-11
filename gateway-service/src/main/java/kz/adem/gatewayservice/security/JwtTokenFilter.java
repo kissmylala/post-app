@@ -1,23 +1,27 @@
 package kz.adem.gatewayservice.security;
 
-import jakarta.servlet.http.HttpServletRequest;
 import kz.adem.gatewayservice.service.TokenValidationService;
 import lombok.RequiredArgsConstructor;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
+
+
+/**
+ * A web filter that intercepts requests to validate JWT tokens.
+ * It checks if the incoming request has a valid JWT token, determines its type (e.g., access or refresh token),
+ * and processes the token accordingly. If the token is valid, the filter sets the user's authentication context
+ * and forwards the request. If the token is invalid or missing, the filter stops the request from proceeding further.
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -26,6 +30,9 @@ public class JwtTokenFilter implements WebFilter {
     private final JwtTokenProvider jwtTokenProvider;
     private final TokenValidationService tokenValidationService;
     private final ReactiveUserDetailsService userDetailsService;
+    private static final String REFRESH_TOKEN_URL = "/api/v1/auth/refresh-token";
+    private static final String USER_HEADER = "user";
+    private static final String USER_ID_HEADER = "user_id";
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
@@ -41,7 +48,7 @@ public class JwtTokenFilter implements WebFilter {
         String tokenType = jwtTokenProvider.extractTokenType(actualToken);
         log.debug("Token type: {}", tokenType);
         if ("refresh_token".equals(tokenType)) {
-            if (!request.getURI().getPath().equals("/api/auth/refresh-token")) {
+            if (!request.getURI().getPath().equals(REFRESH_TOKEN_URL)) {
                 return Mono.error(new RuntimeException("Refresh token is not allowed"));
             }
             return processToken(exchange, chain, actualToken);
@@ -72,8 +79,8 @@ public class JwtTokenFilter implements WebFilter {
                             userDetails.getAuthorities()
                     );
                     ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
-                            .header("user", username)
-                            .header("user_id", userId)
+                            .header(USER_HEADER, username)
+                            .header(USER_ID_HEADER, userId)
                             .build();
                     return chain.filter(exchange.mutate().request(mutatedRequest).build())
                             .contextWrite(ReactiveSecurityContextHolder.withAuthentication(authenticationToken));

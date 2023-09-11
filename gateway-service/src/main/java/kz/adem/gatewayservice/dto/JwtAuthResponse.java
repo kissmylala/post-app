@@ -8,6 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+//DTO containing both access and refresh tokens for JWT authentication.
 public class JwtAuthResponse {
     @JsonProperty("access_token")
     private String accessToken;

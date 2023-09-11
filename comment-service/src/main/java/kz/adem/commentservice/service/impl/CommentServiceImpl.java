@@ -19,7 +19,7 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final PostClient postClient;
     @Override
-    public void createComment(Long postId, CommentDto commentDto) {
+    public CommentDto createComment(Long postId, CommentDto commentDto) {
         if (!postClient.existsById(postId)) {
             throw new ResourceNotFoundException("Post", "id", String.valueOf(postId));
         }
@@ -29,6 +29,7 @@ public class CommentServiceImpl implements CommentService {
         comment.setBody(commentDto.getBody());
         comment.setLikes(0L);
         commentRepository.save(comment);
+        return CommentMapper.MAPPER.mapToDto(comment);
     }
 
     @Override
@@ -68,11 +69,11 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public String deleteComment(Long postId, Long commentId, String username, Long userId) {
+    public CommentDto deleteComment(Long postId, Long commentId, String username, Long userId) {
         validatePostExists(postId);
         Comment comment = getCommentAndValidateUser(commentId, username, userId);
-        commentRepository.deleteById(commentId);
-        return "Comment successfully deleted";
+        commentRepository.delete(comment);
+        return CommentMapper.MAPPER.mapToDto(comment);
     }
 
     @Override

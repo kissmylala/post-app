@@ -1,5 +1,7 @@
 package kz.adem.gatewayservice.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 @Setter
@@ -13,6 +15,8 @@ public class UserDto {
     private String name;
     private String username;
     private String email;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private boolean enabled;
 }

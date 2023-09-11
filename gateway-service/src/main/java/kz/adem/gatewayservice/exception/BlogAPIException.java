@@ -1,7 +1,7 @@
 package kz.adem.gatewayservice.exception;
 
 import org.springframework.http.HttpStatus;
-
+//Custom exception class, encapsulates HTTP status and message to provide more information about the exception
 public class BlogAPIException extends RuntimeException {
 
     private HttpStatus status;

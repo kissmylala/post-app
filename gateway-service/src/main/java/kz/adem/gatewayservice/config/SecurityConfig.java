@@ -4,6 +4,7 @@ import kz.adem.gatewayservice.security.JwtAuthenticationEntryPoint;
 import kz.adem.gatewayservice.security.JwtTokenFilter;
 import kz.adem.gatewayservice.service.impl.LogoutService;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -25,24 +26,48 @@ import reactor.core.publisher.Mono;
 @Configuration
 @EnableReactiveMethodSecurity
 @EnableWebFluxSecurity
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-    private JwtAuthenticationEntryPoint authenticationEntryPoint;
-    private LogoutService logoutService;
-    private JwtTokenFilter tokenFilter;
+    private final JwtAuthenticationEntryPoint authenticationEntryPoint;
+    private final LogoutService logoutService;
+    private final JwtTokenFilter tokenFilter;
+    private static final String[] PUBLIC_PATHS = {
+            "/api/v1/auth/login",
+            "/api/v1/auth/register",
+            "/api/v1/auth/logout",
+            "/api/token/**",
+            "/api/v1/comments/**",
+            "/api/v1/users/liked/**"
+    };
 
+    private static final String[] SWAGGER_PATHS = {
+            "/v2/api-docs",
+            "/v3/api-docs",
+            "/v3/api-docs/**",
+            "/swagger-resources",
+            "/swagger-resources/**",
+            "/configuration/ui",
+            "/configuration/security",
+            "/swagger-ui/**",
+            "/webjars/**",
+            "/swagger-ui.html",
+            "/swagger-ui/index.html"
+    };
+
+
+    //Security configuration class.
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         http.csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint).accessDeniedHandler((exchange, denied) -> {
-                    exchange.getResponse().setStatusCode( HttpStatus.FORBIDDEN);
+                    exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
                     return Mono.empty();
                 }))
                 .authorizeExchange(exchange -> exchange
-                        .pathMatchers("/api/auth/login", "/api/auth/register", "/api/auth/logout", "/api/token/**", "/api/v1/like/**", "/api/v1/comments/**", "/api/v1/users/liked/usernames"
-                        ,"/api/v1/users/liked/users").permitAll()
-                        .pathMatchers(HttpMethod.GET,"/api/v1/users/**").permitAll()
+                        .pathMatchers(PUBLIC_PATHS).permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/v1/users/**").permitAll()
+                        .pathMatchers(SWAGGER_PATHS).permitAll()
                         .anyExchange().authenticated())
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
                 .addFilterBefore(tokenFilter, SecurityWebFiltersOrder.AUTHENTICATION)
@@ -52,15 +77,13 @@ public class SecurityConfig {
 
         return http.build();
     }
+
     @Bean
-    public ReactiveAuthenticationManager authenticationManager(ReactiveUserDetailsService userDetailsService){
+    public ReactiveAuthenticationManager authenticationManager(ReactiveUserDetailsService userDetailsService) {
         UserDetailsRepositoryReactiveAuthenticationManager authenticationManager = new UserDetailsRepositoryReactiveAuthenticationManager(userDetailsService);
         authenticationManager.setPasswordEncoder(passwordEncoder());
         return authenticationManager;
     }
-
-
-
 
 
     @Bean
