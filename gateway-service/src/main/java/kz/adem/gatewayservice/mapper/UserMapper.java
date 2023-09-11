@@ -5,7 +5,7 @@ import kz.adem.gatewayservice.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
-
+//Mapper for User and UserDto
 @Mapper
 public interface UserMapper {
     UserMapper MAPPER = Mappers.getMapper(UserMapper.class);

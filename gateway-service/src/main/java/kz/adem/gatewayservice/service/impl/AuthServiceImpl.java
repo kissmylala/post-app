@@ -39,6 +39,7 @@ public class AuthServiceImpl implements AuthService {
     private ReactiveUserDetailsService userDetailsService;
     private static final Long ROLE_USER = 2L;
 
+
     @Override
     public Mono<JwtAuthResponse> login(LoginDto loginDto) {
         return userRepository.findByUsername(loginDto.getUsername())

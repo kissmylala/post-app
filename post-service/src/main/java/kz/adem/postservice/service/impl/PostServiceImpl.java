@@ -33,9 +33,23 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public List<PostDto> getAllPostsByUserId(Long userId) {
-        List<Post> posts = postRepository.findAllByUserId(userId).
-                orElseThrow(() -> new ResourceNotFoundException("Posts", "user id", String.valueOf(userId)));
+        List<Post> posts = postRepository.findAllByUserId(userId);
+        if (posts == null || posts.isEmpty()) {
+            throw new ResourceNotFoundException("Posts", "user id", String.valueOf(userId));
+        }
 
+        return posts.stream()
+                .map(PostMapper.MAPPER::mapToDto)
+                .collect(Collectors.toList());
+    }
+
+
+    @Override
+    public List<PostDto> getAllPostsByUsername(String username) {
+        List<Post> posts = postRepository.findAllByUsername(username);
+        if (posts == null || posts.isEmpty()){
+            throw new ResourceNotFoundException("Posts", "username", username);
+        }
         return posts.stream()
                 .map(PostMapper.MAPPER::mapToDto)
                 .collect(Collectors.toList());
@@ -55,16 +69,6 @@ public class PostServiceImpl implements PostService {
         return createPost(postDto);
     }
 
-
-    @Override
-    public List<PostDto> getAllPostsByUsername(String username) {
-        List<Post> posts = postRepository.findAllByUsername(username).
-                orElseThrow(() -> new ResourceNotFoundException("Posts", "username", username));
-
-        return posts.stream()
-                .map(PostMapper.MAPPER::mapToDto)
-                .collect(Collectors.toList());
-    }
 
 
     @Override

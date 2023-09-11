@@ -19,4 +19,7 @@ public class TokenValidationController {
         return tokenValidationService.isTokenValid(token)
                 .map(ResponseEntity::ok);
     }
+
+
+
 }
