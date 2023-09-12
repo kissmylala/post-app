@@ -27,7 +27,6 @@ Services communicate with each other using OpenFeign, which simplifies the HTTP 
 - Spring MVC
 - Docker Compose
 
-Certainly! Here's a beautifully formatted section on how to run the application using `docker-compose` for your `README.MD`:
 
 ---
 
