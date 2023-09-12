@@ -1,0 +1,100 @@
+version: '3.8'
+
+services:
+
+   gateway-service:
+     build: ./gateway-service
+     networks:
+       - postapp_network
+     ports:
+       - '9191:9191'
+     depends_on:
+       - gateway-db
+     restart: on-failure
+
+   gateway-db:
+     image: postgres
+     environment:
+       POSTGRES_DB: postapp_userdb
+       POSTGRES_USER: postgres
+       POSTGRES_PASSWORD: postgres
+     networks:
+       - postapp_network
+     volumes:
+       - gateway-db-data:/var/lib/postgresql/data
+     restart: on-failure
+
+
+
+   post-service:
+     build: ./post-service
+     networks:
+       - postapp_network
+     ports:
+       - '8081:8081'
+     depends_on:
+       - post-db
+     restart: on-failure
+
+   post-db:
+     image: postgres
+     environment:
+       POSTGRES_DB: postapp_postdb
+       POSTGRES_USER: postgres
+       POSTGRES_PASSWORD: postgres
+     networks:
+       - postapp_network
+     volumes:
+       - post-db-data:/var/lib/postgresql/data
+     restart: on-failure
+
+
+   comment-service:
+     build: ./comment-service
+     networks:
+       - postapp_network
+     ports:
+       - '8085:8085'
+     depends_on:
+       - comment-db
+     restart: on-failure
+
+   comment-db:
+     image: postgres
+     environment:
+       POSTGRES_DB: postapp_commentdb
+       POSTGRES_USER: postgres
+       POSTGRES_PASSWORD: postgres
+     networks:
+       - postapp_network
+     volumes:
+       - comment-db-data:/var/lib/postgresql/data
+     restart: on-failure
+
+   service-registry:
+     build: ./registry-service
+     networks:
+       - postapp_network
+     ports:
+       - '8761:8761'
+     restart: on-failure
+
+   adminer:
+     image: adminer
+     restart: always
+     ports:
+       - '8080:8080'
+     networks:
+       - postapp_network
+
+networks:
+  postapp_network:
+
+volumes:
+  gateway-db-data:
+  post-db-data:
+  comment-db-data:
+
+
+
+
