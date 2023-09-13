@@ -25,6 +25,7 @@ Services communicate with each other using OpenFeign, which simplifies the HTTP 
 - Spring Security (based on JWT tokens)
 - Spring Cloud
 - Spring MVC
+- PostgreSQL
 - Docker Compose
 
 
